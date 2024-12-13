@@ -14,4 +14,4 @@
 
 ## Defined in
 
-[packages/core/src/messages.ts:94](https://github.com/ai16z/eliza/blob/main/packages/core/src/messages.ts#L94)
+[packages/core/src/messages.ts:94](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/messages.ts#L94)

@@ -100,4 +100,4 @@ Main Character schema
 
 ## Defined in
 
-[packages/core/src/environment.ts:66](https://github.com/ai16z/eliza/blob/main/packages/core/src/environment.ts#L66)
+[packages/core/src/environment.ts:66](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/environment.ts#L66)

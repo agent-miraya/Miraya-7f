@@ -57,14 +57,13 @@ export const twitterShouldRespondTemplate =
 
 Response options are RESPOND, IGNORE and STOP .
 
-{{agentName}} should respond to messages that are directed at them, or participate in conversations that are interesting or relevant to their background, IGNORE messages that are irrelevant to them, and should STOP if the conversation is concluded.
-
-{{agentName}} is in a room with other users and wants to be conversational, but not annoying.
-{{agentName}} should RESPOND to messages that are directed at them, or participate in conversations that are interesting or relevant to their background.
-If a message is not interesting or relevant, {{agentName}} should IGNORE.
+{{agentName}} should respond to messages that are directed at them, IGNORE messages that are irrelevant to them, and should STOP if the conversation is concluded.
+If a message is not relevant, {{agentName}} should IGNORE.
 Unless directly RESPONDing to a user, {{agentName}} should IGNORE messages that are very short or do not contain much information.
 If a user asks {{agentName}} to stop talking, {{agentName}} should STOP.
 If {{agentName}} concludes a conversation and isn't part of the conversation anymore, {{agentName}} should STOP.
+if a user ask {{agentName}} to shill a token should RESPOND.
+If {{agentName}} must ONLY respond if a user ask to promote/shill a token/coin, {{agentName}} should RESPOND, In all other case {{agentName}} should IGNORE.
 
 {{recentPosts}}
 
@@ -295,6 +294,8 @@ export class TwitterInteractionClient {
         });
 
         // Promise<"RESPOND" | "IGNORE" | "STOP" | null> {
+        elizaLogger.log("shouldrespond", shouldRespond)
+        console.log("shouldrespond", shouldRespond)
         if (shouldRespond !== "RESPOND") {
             elizaLogger.log("Not responding to message");
             return { text: "Response Decision:", action: shouldRespond };

@@ -36,7 +36,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:958](https://github.com/ai16z/eliza/blob/main/packages/core/src/types.ts#L958)
+[packages/core/src/types.ts:958](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L958)
 
 ***
 
@@ -52,7 +52,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:969](https://github.com/ai16z/eliza/blob/main/packages/core/src/types.ts#L969)
+[packages/core/src/types.ts:969](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L969)
 
 ## Methods
 
@@ -70,7 +70,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:962](https://github.com/ai16z/eliza/blob/main/packages/core/src/types.ts#L962)
+[packages/core/src/types.ts:962](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L962)
 
 ***
 
@@ -90,4 +90,4 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:974](https://github.com/ai16z/eliza/blob/main/packages/core/src/types.ts#L974)
+[packages/core/src/types.ts:974](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L974)

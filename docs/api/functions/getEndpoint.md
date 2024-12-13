@@ -14,4 +14,4 @@
 
 ## Defined in
 
-[packages/core/src/models.ts:393](https://github.com/ai16z/eliza/blob/main/packages/core/src/models.ts#L393)
+[packages/core/src/models.ts:393](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/models.ts#L393)

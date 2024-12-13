@@ -10,7 +10,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1150](https://github.com/ai16z/eliza/blob/main/packages/core/src/types.ts#L1150)
+[packages/core/src/types.ts:1150](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L1150)
 
 ***
 
@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1151](https://github.com/ai16z/eliza/blob/main/packages/core/src/types.ts#L1151)
+[packages/core/src/types.ts:1151](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L1151)
 
 ***
 
@@ -30,4 +30,4 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1152](https://github.com/ai16z/eliza/blob/main/packages/core/src/types.ts#L1152)
+[packages/core/src/types.ts:1152](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L1152)

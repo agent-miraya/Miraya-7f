@@ -14,6 +14,7 @@ import {
     stringToUuid,
     elizaLogger,
     getEmbeddingZeroVector,
+    generateObject,
 } from "@ai16z/eliza";
 import { ClientBase } from "./base";
 import { buildConversationThread, sendTweet, wait } from "./utils.ts";
@@ -48,6 +49,12 @@ Thread of Tweets You Are Replying To:
 
 {{actions}}
 
+# Token Response Guidelines:
+- If user mentions a token ($SYMBOL), provide information about the token
+- Include token price if available
+- Add appropriate disclaimers
+- Keep responses professional and compliance-focused
+
 # Task: Generate a post in the voice, style and perspective of {{agentName}} (@{{twitterUserName}}). Include an action, if appropriate. {{actionNames}}:
 {{currentPost}}
 ` + messageCompletionFooter;
@@ -77,6 +84,62 @@ Thread of Tweets You Are Replying To:
 
 # INSTRUCTIONS: Respond with [RESPOND] if {{agentName}} should respond, or [IGNORE] if {{agentName}} should not respond to the last message and [STOP] if {{agentName}} should stop participating in the conversation.
 ` + shouldRespondFooter;
+
+// export const tweetToInfoTemplate = `
+// # INSTRUCTIONS: Extract key promotional information from the conversation about token/coin shilling. Respond ONLY with a JSON object containing the following details if found:
+
+// - Token symbol (tokens typically start with $ but distinguish from price amounts)
+// - Campaign slogan or tagline
+// - Bounty/reward amount
+// - Campaign duration
+
+// Do not make assumptions or add information that isn't explicitly stated in the conversation. If a field cannot be found, omit it from the response object.
+
+// {{currentPost}}
+
+// Thread of Tweets You Are Replying To:
+
+// {{formattedConversation}}
+
+// # INSTRUCTIONS: Respond only with a JSON object containing the found information in this format:
+// {
+//   "token": "string",     // The token symbol
+//   "slogan": "string",    // Marketing slogan/tagline
+//   "bounty": "string",    // Reward amount
+//   "duration": "string"   // Campaign timeframe
+// }
+
+// If no promotional information is found, respond with an empty object {}.
+// `
+
+const tweetToInfoTemplate = `Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined.
+
+Example response:
+\`\`\`json
+{
+  "name": "Test Token",
+  "token": "$USDC",     // The token symbol
+  "slogan": "best memecoin in solana",    // Marketing slogan/tagline
+  "bounty": "10BONK",    // Reward amount
+  "duration": "1024"   // Campaign timeframe(in seconds), convert automatically from any given time window.
+}
+\`\`\`
+
+Do not make assumptions or add information that isn't explicitly stated in the conversation. If a field cannot be found, omit it from the response object.
+
+{{currentPost}}
+
+Thread of Tweets You Are Replying To:
+
+{{formattedConversation}}
+
+Given the recent messages, extract or generate (come up with if not included) the following information about the requested token creation:
+- Token name
+- Token symbol
+- Token/campaign description  or slogan
+- Amount of tokens for bounty. Usually in crypto, likr 100BONK, or 1000USDC
+
+Respond with a JSON markdown block containing only the extracted values.`;
 
 export class TwitterInteractionClient {
     client: ClientBase;
@@ -252,6 +315,8 @@ export class TwitterInteractionClient {
         const tweetExists =
             await this.runtime.messageManager.getMemoryById(tweetId);
 
+        elizaLogger.log("This is latest code v1.0")
+
         if (!tweetExists) {
             elizaLogger.log("tweet does not exist, saving");
             const userIdUUID = stringToUuid(tweet.userId as string);
@@ -300,6 +365,20 @@ export class TwitterInteractionClient {
             elizaLogger.log("Not responding to message");
             return { text: "Response Decision:", action: shouldRespond };
         }
+
+        const tweetToInfoContext = composeContext({
+            state,
+            template: tweetToInfoTemplate
+        });
+
+        const campaignDetails = await generateObject({
+            runtime: this.runtime,
+            context: tweetToInfoContext,
+            modelClass: ModelClass.MEDIUM,
+        });
+
+        console.log(campaignDetails)
+        elizaLogger.log("Campaign Details:", campaignDetails);
 
         const context = composeContext({
             state,

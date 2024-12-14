@@ -1,5 +1,0 @@
-.env
-node_modules
-dist
-pre-build-test
-post-build-test

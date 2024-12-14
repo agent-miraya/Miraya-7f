@@ -4,12 +4,15 @@ import { TwitterInteractionClient } from "./interactions.ts";
 import { IAgentRuntime, Client, elizaLogger } from "@ai16z/eliza";
 import { validateTwitterConfig } from "./environment.ts";
 import { ClientBase } from "./base.ts";
+import { TwitterAccountBalanceClass } from "./monitorAddress.ts";
 
 class TwitterManager {
     client: ClientBase;
     post: TwitterPostClient;
     search: TwitterSearchClient;
     interaction: TwitterInteractionClient;
+    monitor: TwitterAccountBalanceClass
+    // monitor:
     constructor(runtime: IAgentRuntime) {
         this.client = new ClientBase(runtime);
         this.post = new TwitterPostClient(this.client, runtime);
@@ -18,6 +21,15 @@ class TwitterManager {
         // burns your rate limit and can get your account banned
         // use at your own risk
         this.interaction = new TwitterInteractionClient(this.client, runtime);
+        this.monitor = new TwitterAccountBalanceClass(this.client, runtime);
+
+        // this.monitor = new monitor(
+        //     "wss://api.mainnet-beta.solana.com",
+        //     "J5HvPHYHsWQeHdYaTzXTRr5Cx1t6SAqvacFMsvcxgPi3",
+        //     "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+        //     1.0 // threshold in SOL
+        // );
+
     }
 }
 
@@ -31,7 +43,11 @@ export const TwitterClientInterface: Client = {
 
         await manager.client.init();
 
-        await manager.post.start();
+        await manager.monitor.start()
+
+        // await manager.post.start();
+
+
 
         await manager.interaction.start();
 

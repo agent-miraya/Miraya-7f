@@ -59,6 +59,45 @@ Thread of Tweets You Are Replying To:
 {{currentPost}}
 ` + messageCompletionFooter;
 
+export const requestFundTemplate =
+    `
+# Areas of Expertise
+{{knowledge}}
+
+# About {{agentName}} (@{{twitterUserName}}):
+{{lore}}
+{{topics}}
+
+{{providers}}
+
+{{characterPostExamples}}
+
+{{postDirections}}
+
+Recent interactions between {{agentName}} and other users:
+{{recentPostInteractions}}
+
+{{recentPosts}}
+
+# Task: Generate a post/reply in the voice, style and perspective of {{agentName}} (@{{twitterUserName}}) while using the thread of tweets as additional context:
+Current Post:
+{{currentPost}}
+
+Thread of Tweets You Are Replying To:
+{{formattedConversation}}
+
+{{actions}}
+
+# Token Response Guidelines:
+- You have to request funds from the user.
+- Include token name also.
+- Add appropriate disclaimers
+- Keep responses professional and compliance-focused
+
+# Task: Generate a post in the voice, style and perspective of {{agentName}} (@{{twitterUserName}}). Include an action, if appropriate. {{actionNames}}:
+{{currentPost}}
+` + messageCompletionFooter;
+
 export const twitterShouldRespondTemplate =
     `# INSTRUCTIONS: Determine if {{agentName}} (@{{twitterUserName}}) should respond to the message and participate in the conversation. Do not comment. Just respond with "true" or "false".
 
@@ -391,11 +430,15 @@ export class TwitterInteractionClient {
 
         elizaLogger.debug("Interactions prompt:\n" + context);
 
-        const response = await generateMessageResponse({
-            runtime: this.runtime,
-            context,
-            modelClass: ModelClass.MEDIUM,
-        });
+        const response: Content = {
+            text: `To start your campaign, please send ${campaignDetails?.bounty} to:\n\n${"J5HvPHYHsWQeHdYaTzXTRr5Cx1t6SAqvacFMsvcxgPi3"}\n\nCampaign will activate automatically after funds are received. ⏳\n\n🔒 Verify address carefully before sending.`
+        }
+
+        // const response = await generateMessageResponse({
+        //     runtime: this.runtime,
+        //     context,
+        //     modelClass: ModelClass.MEDIUM,
+        // });
 
         const removeQuotes = (str: string) =>
             str.replace(/^['"](.*)['"]$/, "$1");

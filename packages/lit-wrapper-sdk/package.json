@@ -1,0 +1,54 @@
+{
+  "name": "@ai16z/lit-wrapper-sdk",
+  "version": "0.0.5",
+  "author": "Ansh Saxena",
+  "license": "MIT",
+  "description": "A wrapper SDK for Lit Protocol",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anshss/lit-wrapper-sdk.git"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "prepare": "npm run build",
+    "test": "mocha --loader=ts-node/esm test/**/*.ts",
+    "example": "cd examples && node src/tester",
+    "test:pre": "node --loader ts-node/esm pre-build-test/script",
+    "test:post": "node post-build-test/script"
+  },
+  "dependencies": {
+    "@lit-protocol/auth-helpers": "^7.0.0-alpha.9",
+    "@lit-protocol/constants": "^7.0.0-alpha.9",
+    "@lit-protocol/contracts-sdk": "^7.0.0-alpha.9",
+    "@lit-protocol/lit-auth-client": "^7.0.0-alpha.9",
+    "@lit-protocol/lit-node-client": "^7.0.0-alpha.9",
+    "@lit-protocol/wrapped-keys": "^7.0.0-alpha.9",
+    "@solana/spl-token": "^0.4.9",
+    "@solana/web3.js": "^1.95.8",
+    "bs58": "^6.0.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^5.0.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.10.2",
+    "chai": "^5.1.2",
+    "mocha": "^11.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}

@@ -489,9 +489,9 @@ export class TwitterInteractionClient {
 
             await this.runtime.messageManager.createMemory(message);
 
-            // const hash = await distributeFunds(message, isShillingForCampaign, this.runtime.getSetting("LIT_EVM_PRIVATE_KEY"));
+            const hash = await distributeFunds(message, isShillingForCampaign, this.runtime.getSetting("LIT_EVM_PRIVATE_KEY"));
 
-            const hash = "5DX7bpncr7XKRKsoJ7UL8xq7R8E3KLrWJeXyz4GMUEnhjrhmKysQD8NXwmobKsMPvduBKvpZJLWgjHeV6nfDXNd4"
+            // const hash = "5DX7bpncr7XKRKsoJ7UL8xq7R8E3KLrWJeXyz4GMUEnhjrhmKysQD8NXwmobKsMPvduBKvpZJLWgjHeV6nfDXNd4"
             const link = `https://solscan.io/tx/${hash}`
 
             const response: Content = {

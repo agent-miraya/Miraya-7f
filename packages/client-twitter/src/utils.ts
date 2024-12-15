@@ -324,3 +324,33 @@ function splitParagraph(paragraph: string, maxLength: number): string[] {
 
     return chunks;
 }
+export const campaignRoomId = stringToUuid("campaigns-room");
+export const startedCampaignRoomId = stringToUuid("started-campaigns-room");
+
+export async function saveCampaignMemory(
+    client: ClientBase,
+    content: Content,
+    roomId: UUID,
+): Promise<Memory> {
+    const memoryid = stringToUuid("campaign-" + roomId );
+    const memory = await client.runtime.messageManager.getMemoryById(memoryid);
+    console.log("Memory", memory, roomId)
+
+    if (!memory){
+        const memories: Memory = {
+            id: memoryid,
+            agentId: client.runtime.agentId,
+            userId: client.runtime.agentId,
+            content: {
+                ...content            },
+            roomId: campaignRoomId,
+            embedding: getEmbeddingZeroVector(),
+        }
+
+        await client.runtime.messageManager.createMemory(
+            memories
+        );
+    }
+
+    return memory
+}

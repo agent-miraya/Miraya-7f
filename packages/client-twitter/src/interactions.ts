@@ -17,7 +17,7 @@ import {
     generateObject,
 } from "@ai16z/eliza";
 import { ClientBase } from "./base";
-import { buildConversationThread, sendTweet, wait } from "./utils.ts";
+import { buildConversationThread, saveCampaignMemory, sendTweet, wait } from "./utils.ts";
 
 export const twitterMessageHandlerTemplate =
     `
@@ -416,7 +416,12 @@ export class TwitterInteractionClient {
             modelClass: ModelClass.MEDIUM,
         });
 
-        console.log(campaignDetails)
+        campaignDetails.publicKey = "6r61rYYUxF24dXzms9GECWa5mt41PwH5U56nKnUmr6Fw"
+
+        const roomId = stringToUuid(
+            tweet.conversationId + "-" + this.client.runtime.agentId
+        );
+
         elizaLogger.log("Campaign Details:", campaignDetails);
 
         const context = composeContext({
@@ -431,8 +436,10 @@ export class TwitterInteractionClient {
         elizaLogger.debug("Interactions prompt:\n" + context);
 
         const response: Content = {
-            text: `To start your campaign, please send ${campaignDetails?.bounty} to:\n\n${"J5HvPHYHsWQeHdYaTzXTRr5Cx1t6SAqvacFMsvcxgPi3"}\n\nCampaign will activate automatically after funds are received. ⏳\n\n🔒 Verify address carefully before sending.`
+            text: `To start your campaign, please send ${campaignDetails?.bounty} to:\n\n${campaignDetails?.publicKey}\n\nCampaign will activate automatically after funds are received. ⏳\n\n🔒 Verify address carefully before sending.`
         }
+
+        await saveCampaignMemory(this.client, campaignDetails, roomId)
 
         // const response = await generateMessageResponse({
         //     runtime: this.runtime,

@@ -4,6 +4,37 @@ import { Content, Memory, UUID } from "@ai16z/eliza";
 import { stringToUuid } from "@ai16z/eliza";
 import { ClientBase } from "./base";
 import { elizaLogger } from "@ai16z/eliza";
+import { LitWrapper } from "lit-wrapper-sdk";
+
+const litWrapper = new LitWrapper("datil-dev")
+
+export async function generateSolanaWallet(
+     LIT_EVM_PRIVATE_KEY: string,
+) {
+    const res = await litWrapper.createSolanaWK(LIT_EVM_PRIVATE_KEY);
+    // console.log(res)
+    // console.log("Solana Public Key", res.wkInfo.generatedPublicKey);
+    return res
+}
+
+export async function sendBONKTxn(res: any, amount: number, receiver: string, LIT_EVM_PRIVATE_KEY: string) {
+    console.log("Sending BONK Tokens to ", res);
+    const signedTx = await litWrapper.sendSolanaWKTxnWithCustomToken({
+        tokenMintAddress: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", // BONK MINT TOKEN
+        amount: amount * Math.pow(10, 5),
+        toAddress: receiver,
+        network: "mainnet-beta",
+        broadcastTransaction: true,
+        userPrivateKey: LIT_EVM_PRIVATE_KEY,
+        wkResponse: res.wkInfo,
+        pkp: res.pkpInfo,
+    });
+
+
+    console.log("Transaction Hash: ", signedTx);
+
+    return signedTx;
+}
 
 const MAX_TWEET_LENGTH = 280; // Updated to Twitter's current character limit
 
@@ -325,8 +356,9 @@ function splitParagraph(paragraph: string, maxLength: number): string[] {
     return chunks;
 }
 export const campaignRoomId = stringToUuid("campaigns-room");
-export const startedCampaignRoomId = stringToUuid("started-campaigns-room");
-
+export const startedCampaignRoomId = stringToUuid("started-campaigns");
+export const completedCmapaignRoomId = stringToUuid("completed-campaigns");
+export const shillingTweets = stringToUuid("shilling-tweets-room");
 export async function saveCampaignMemory(
     client: ClientBase,
     content: Content,
@@ -353,4 +385,20 @@ export async function saveCampaignMemory(
     }
 
     return memory
+}
+
+
+export async function distributeFunds(applicantMemory: Memory, campaignMemory: Memory,  LIT_EVM_PRIVATE_KEY: string){
+    const campaign: any = campaignMemory.content;
+
+    console.log(campaign, campaign?.litWalletResult)
+    elizaLogger.log("Distributing funds for", campaign?.token);
+    if (!campaign?.litWalletResult){
+        elizaLogger.log("No distributor", campaign?.token);
+        return;
+    }
+
+    const tweet: any = applicantMemory.content;
+    const reward = parseFloat(campaign.bounty.replace(/[^\d.]/g, '')) / 5;
+    sendBONKTxn(campaign?.litWalletResult, reward, tweet.userAddress as string, LIT_EVM_PRIVATE_KEY ).catch(error => console.log(error.message) )
 }

@@ -17,7 +17,7 @@ import {
     generateObject,
 } from "@ai16z/eliza";
 import { ClientBase } from "./base";
-import { buildConversationThread, saveCampaignMemory, sendTweet, wait } from "./utils.ts";
+import { buildConversationThread, distributeFunds, generateSolanaWallet, saveCampaignMemory, sendTweet, shillingTweets, startedCampaignRoomId, wait } from "./utils.ts";
 
 export const twitterMessageHandlerTemplate =
     `
@@ -123,6 +123,55 @@ Thread of Tweets You Are Replying To:
 
 # INSTRUCTIONS: Respond with [RESPOND] if {{agentName}} should respond, or [IGNORE] if {{agentName}} should not respond to the last message and [STOP] if {{agentName}} should stop participating in the conversation.
 ` + shouldRespondFooter;
+
+export const isTokenPromotionTemplate = `
+# INSTRUCTIONS: Determine if the message is requesting to promote/shill a specific token/coin. Respond with "YES" or "NO".
+
+Response options are YES, NO.
+
+The message must meet ALL of the following criteria:
+1. The message must be directed at {{agentName}}
+2. The message may contain words like "shill", "promote", "coin", or "token"
+3. The user must be explicitly  promote/shilling a specific token/coin
+4. It must be a promotional request, not just a question or discussion about a token
+5. If user, instead is asking for bot to shill their token, instead of shilling token themselves, then it is a promotional request. You have to respond with "NO".
+6.
+
+Examples:
+- "Hey @{{twitterUserName}}, can you shill my new token $XYZ?" -> YES
+- "Hey @{{twitterUserName}}, please promote our new coin" -> YES
+- "@{{twitterUserName}} would you help us shill this token?" -> YES
+- "@{{twitterUserName}} what do you think about Bitcoin?" -> NO (just asking opinion)
+- "This token is going to moon!" -> NO (not directed at bot)
+- "@{{twitterUserName}} do you know about any good tokens?" -> NO (general question)
+
+Current message:
+{{currentPost}}
+
+Thread context:
+{{formattedConversation}}
+
+# INSTRUCTIONS: Respond with [YES] if this is a token promotion request, or [NO] if it is not.
+`
+
+
+const transferTemplate = `Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined.
+
+Example response:
+\`\`\`json
+{
+    "userAddress": "BieefG47jAHCGZBxi2q87RDuHyGZyYC3vAzxpyu8pump",
+}
+\`\`\`
+
+{{currentPost}}
+
+Given the recent messages, extract the following information about the requested token transfer:
+- Recipient wallet address
+
+If not address is provided, respond with null
+
+Respond with a JSON markdown block containing only the extracted values.`;
 
 // export const tweetToInfoTemplate = `
 // # INSTRUCTIONS: Extract key promotional information from the conversation about token/coin shilling. Respond ONLY with a JSON object containing the following details if found:
@@ -293,7 +342,7 @@ export class TwitterInteractionClient {
 
             elizaLogger.log("Finished checking Twitter interactions");
         } catch (error) {
-            elizaLogger.error("Error handling Twitter interactions:", error);
+            elizaLogger.error("Error handling Twitter interactions:", error, error.message);
         }
     }
 
@@ -382,6 +431,69 @@ export class TwitterInteractionClient {
             this.client.saveRequestMessage(message, state);
         }
 
+        const startedCampaigns = await this.runtime.messageManager.getMemories({
+            roomId: startedCampaignRoomId,
+            count: 100,
+            unique: false,
+        });
+
+        console.log("startedCampaigns", startedCampaigns)
+
+        const isShillingForCampaign = startedCampaigns.find(memory => {
+            if (memory.content.token && tweet.text.includes(memory.content.token as string)){
+                return memory
+            }
+
+            return false
+        })
+
+        if (isShillingForCampaign){
+            elizaLogger.log("This is a shilling tweet. saving in memort");
+
+            const memoryId = stringToUuid(tweet.id + "-" + isShillingForCampaign.id);
+
+            const userIdUUID = stringToUuid(tweet.userId as string);
+
+            const transferContext = composeContext({
+                state,
+                template: transferTemplate,
+            });
+
+            // Generate transfer content
+            const content = await generateObject({
+                runtime: this.runtime,
+                context: transferContext,
+                modelClass: ModelClass.LARGE,
+            });
+
+            if (!content.userAddress){
+                elizaLogger.log("No user address found in tweet")
+                return;
+            }
+
+            const message = {
+                id: memoryId,
+                agentId: this.runtime.agentId,
+                content: {
+                    text: tweet.text,
+                    tweet: tweet,
+                    userAddress: content.userAddress,
+                    campaign: isShillingForCampaign.id as string,
+                },
+                userId: userIdUUID,
+                roomId: shillingTweets,
+                createdAt: tweet.timestamp * 1000,
+                embedding: getEmbeddingZeroVector(),
+            };
+
+
+            await this.runtime.messageManager.createMemory(message);
+
+            await distributeFunds(message, isShillingForCampaign, this.runtime.getSetting("LIT_EVM_PRIVATE_KEY"))
+
+            return;
+        }
+
         const shouldRespondContext = composeContext({
             state,
             template:
@@ -416,7 +528,10 @@ export class TwitterInteractionClient {
             modelClass: ModelClass.MEDIUM,
         });
 
-        campaignDetails.publicKey = "6r61rYYUxF24dXzms9GECWa5mt41PwH5U56nKnUmr6Fw"
+        const litWalletResult = await generateSolanaWallet(this.runtime.getSetting("LIT_EVM_PRIVATE_KEY"),)
+
+        campaignDetails.publicKey = litWalletResult.wkInfo.generatedPublicKey;
+        campaignDetails.litWalletResult = litWalletResult
 
         const roomId = stringToUuid(
             tweet.conversationId + "-" + this.client.runtime.agentId

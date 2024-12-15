@@ -3,7 +3,7 @@ import { getAssociatedTokenAddress } from "@solana/spl-token";
 
 import { IAgentRuntime, Memory, ModelClass, composeContext, elizaLogger, generateText, getEmbeddingZeroVector, stringToUuid } from "@ai16z/eliza";
 import { ClientBase } from "./base";
-import { campaignRoomId, startedCampaignRoomId } from "./utils";
+import { campaignRoomId, startedCampaignRoomId, sendBONKTxn, shillingTweets } from "./utils";
 import { Tweet } from "agent-twitter-client";
 import { truncateToCompleteSentence } from "./postCampaign";
 
@@ -22,7 +22,7 @@ const twitterPostTemplate = `
 
 # Task: Generate a post in the voice and style and perspective of {{agentName}} @{{twitterUserName}}.
 Write a post telling users about {{token}} token.
-Write a 1-3 sentence post that is informing users about {{token}} token. The goal of post if to inform users that anyone who will promote this token will receive award from pool of {{bounty}} as a price, depepnding on the reach, from the perspective of {{agentName}}. The name of token is {{name}} and slogan is(maybe empty): {{slogan}}. At last you have to inform user that they have to be eligible they have to tag the user. Do not add commentary or acknowledge this request, just write the post.
+Write a 1-3 sentence post that is informing users about {{token}} token. The goal of post if to inform users that anyone who will promote this token will receive award from pool of {{bounty}} as a price, depepnding on the reach, from the perspective of {{agentName}}. The name of token is {{name}} and slogan is(maybe empty): {{slogan}}. At last you have to inform user that they have to be eligible they have to tag the {{agentName}} and attach their solana public key. Do not add commentary or acknowledge this request, just write the post.
 Your response should not contain any questions. Brief, concise statements only. The total character count MUST be less than 280. No emojis. Use \\n\\n (double spaces) between statements.`;
 
 
@@ -34,6 +34,23 @@ export class TwitterAccountBalanceClass {
     constructor(client: ClientBase, runtime: IAgentRuntime) {
         this.client = client;
         this.runtime = runtime;
+    }
+
+    async getStartedCampaigns() {
+        elizaLogger.log("checking started campaigns");
+        const campaigns = await this.runtime.messageManager.getMemories({
+            roomId: startedCampaignRoomId,
+            count: 100,
+            unique: false,
+        });
+
+        // campaigns.map(item => this.distributeFunds(item))
+
+        // elizaLogger.log("started campaigns", campaigns);
+
+
+
+        return campaigns;
     }
 
     async getActiveCampaigns() {
@@ -48,9 +65,35 @@ export class TwitterAccountBalanceClass {
         //     .map((item) => ({...item.content, id: item.id}))
         //     .filter((campaign: any) => !campaign.started);
 
-        // elizaLogger.log("active campaigns", activeCampaigns);
+        elizaLogger.log("active campaigns", campaigns);
 
         return campaigns;
+    }
+
+    async distributeFunds(campaignMemory: Memory){
+        const campaign: any = campaignMemory.content;
+        elizaLogger.log("Distributing funds for", campaign?.token);
+        if (!campaign?.litWalletResult){
+            elizaLogger.log("No distributor", campaign?.token);
+            return;
+        }
+
+        const applicants = await this.runtime.messageManager.getMemories({
+            roomId: shillingTweets,
+            count: 100,
+            unique: false,
+        });
+
+        if (!applicants){
+            elizaLogger.log("No applicants found", campaign?.token);
+            return;
+        }
+
+        applicants.map(memory => {
+            const tweet = memory.content;
+            const reward = parseFloat(campaign.bounty.replace(/[^\d.]/g, '')) / applicants.length;
+            sendBONKTxn(campaign?.litWalletResult, reward, tweet.userAddress as string, this.runtime.getSetting("LIT_EVM_PRIVATE_KEY") ).catch(error => console.log(error.message) )
+        })
     }
 
     async start() {
@@ -60,6 +103,7 @@ export class TwitterAccountBalanceClass {
                     this.handleMonitorActiveCampaign(campaign);
                 });
             });
+            // this.getStartedCampaigns()
             // this.handleTwitterInteractions();
             setTimeout(
                 handleTwitterInteractionsLoop,
@@ -107,6 +151,7 @@ export class TwitterAccountBalanceClass {
             }
 
             if (amount >= parseFloat(campaign.bounty.replace(/[^\d.]/g, ''))){
+            // if (true){
                 await this.generateNewTweet(campaign)
                 await this.runtime.messageManager.removeMemory(campaignMemory.id)
                 await this.runtime.messageManager.createMemory({...campaignMemory, roomId: startedCampaignRoomId})

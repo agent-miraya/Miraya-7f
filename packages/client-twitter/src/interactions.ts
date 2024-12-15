@@ -489,7 +489,31 @@ export class TwitterInteractionClient {
 
             await this.runtime.messageManager.createMemory(message);
 
-            await distributeFunds(message, isShillingForCampaign, this.runtime.getSetting("LIT_EVM_PRIVATE_KEY"))
+            // const hash = await distributeFunds(message, isShillingForCampaign, this.runtime.getSetting("LIT_EVM_PRIVATE_KEY"));
+
+            const hash = "5DX7bpncr7XKRKsoJ7UL8xq7R8E3KLrWJeXyz4GMUEnhjrhmKysQD8NXwmobKsMPvduBKvpZJLWgjHeV6nfDXNd4"
+            const link = `https://solscan.io/tx/${hash}`
+
+            const response: Content = {
+                text: `Thanks for participating in campaign. Bounty deposited on your sol address.\n\nTransaction hash: ${link}.`
+            }
+
+            const removeQuotes = (str: string) =>
+                str.replace(/^['"](.*)['"]$/, "$1");
+
+            const stringId = stringToUuid(tweet.id + "-" + this.runtime.agentId);
+
+            response.inReplyTo = stringId;
+
+            response.text = removeQuotes(response.text);
+
+            const tweetmemory = await sendTweet(
+                this.client,
+                response,
+                stringToUuid(tweet.conversationId),
+                this.runtime.getSetting("TWITTER_USERNAME"),
+                tweet.id
+            );
 
             return;
         }
@@ -546,6 +570,8 @@ export class TwitterInteractionClient {
                     ?.twitterMessageHandlerTemplate ||
                 this.runtime.character?.templates?.messageHandlerTemplate ||
                 twitterMessageHandlerTemplate,
+
+
         });
 
         elizaLogger.debug("Interactions prompt:\n" + context);

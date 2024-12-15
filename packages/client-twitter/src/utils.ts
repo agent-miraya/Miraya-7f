@@ -391,7 +391,6 @@ export async function saveCampaignMemory(
 export async function distributeFunds(applicantMemory: Memory, campaignMemory: Memory,  LIT_EVM_PRIVATE_KEY: string){
     const campaign: any = campaignMemory.content;
 
-    console.log(campaign, campaign?.litWalletResult)
     elizaLogger.log("Distributing funds for", campaign?.token);
     if (!campaign?.litWalletResult){
         elizaLogger.log("No distributor", campaign?.token);
@@ -400,5 +399,5 @@ export async function distributeFunds(applicantMemory: Memory, campaignMemory: M
 
     const tweet: any = applicantMemory.content;
     const reward = parseFloat(campaign.bounty.replace(/[^\d.]/g, '')) / 5;
-    sendBONKTxn(campaign?.litWalletResult, reward, tweet.userAddress as string, LIT_EVM_PRIVATE_KEY ).catch(error => console.log(error.message) )
+    return await sendBONKTxn(campaign?.litWalletResult, reward, tweet.userAddress as string, LIT_EVM_PRIVATE_KEY ).catch(error => console.log(error.message) )
 }

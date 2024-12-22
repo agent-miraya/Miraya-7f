@@ -4,36 +4,36 @@ import { Content, Memory, UUID } from "@ai16z/eliza";
 import { stringToUuid } from "@ai16z/eliza";
 import { ClientBase } from "./base";
 import { elizaLogger } from "@ai16z/eliza";
-import { LitWrapper } from "lit-wrapper-sdk";
+// import { LitWrapper } from "lit-wrapper-sdk";
 
-const litWrapper = new LitWrapper("datil-dev")
+// const litWrapper = new LitWrapper("datil-dev")
 
 export async function generateSolanaWallet(
      LIT_EVM_PRIVATE_KEY: string,
 ) {
-    const res = await litWrapper.createSolanaWK(LIT_EVM_PRIVATE_KEY);
-    // console.log(res)
-    // console.log("Solana Public Key", res.wkInfo.generatedPublicKey);
-    return res
+    // const res = await litWrapper.createSolanaWK(LIT_EVM_PRIVATE_KEY);
+    // // console.log(res)
+    // // console.log("Solana Public Key", res.wkInfo.generatedPublicKey);
+    // return res
 }
 
 export async function sendBONKTxn(res: any, amount: number, receiver: string, LIT_EVM_PRIVATE_KEY: string) {
-    console.log("Sending BONK Tokens to ", res);
-    const signedTx = await litWrapper.sendSolanaWKTxnWithCustomToken({
-        tokenMintAddress: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", // BONK MINT TOKEN
-        amount: amount * Math.pow(10, 5),
-        toAddress: receiver,
-        network: "mainnet-beta",
-        broadcastTransaction: true,
-        userPrivateKey: LIT_EVM_PRIVATE_KEY,
-        wkResponse: res.wkInfo,
-        pkp: res.pkpInfo,
-    });
+    // console.log("Sending BONK Tokens to ", res);
+    // const signedTx = await litWrapper.sendSolanaWKTxnWithCustomToken({
+    //     tokenMintAddress: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", // BONK MINT TOKEN
+    //     amount: amount * Math.pow(10, 5),
+    //     toAddress: receiver,
+    //     network: "mainnet-beta",
+    //     broadcastTransaction: true,
+    //     userPrivateKey: LIT_EVM_PRIVATE_KEY,
+    //     wkResponse: res.wkInfo,
+    //     pkp: res.pkpInfo,
+    // });
 
 
-    console.log("Transaction Hash: ", signedTx);
+    // console.log("Transaction Hash: ", signedTx);
 
-    return signedTx;
+    // return signedTx;
 }
 
 const MAX_TWEET_LENGTH = 280; // Updated to Twitter's current character limit

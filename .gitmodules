@@ -1,0 +1,3 @@
+[submodule "Miraya-lit-actions"]
+	path = Miraya-lit-actions
+	url = git@github.com:solana-autonomous-agents/Miraya-lit-actions.git

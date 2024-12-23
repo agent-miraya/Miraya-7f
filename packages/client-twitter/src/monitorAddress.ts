@@ -3,9 +3,13 @@ import { getAssociatedTokenAddress } from "@solana/spl-token";
 
 import { IAgentRuntime, Memory, ModelClass, composeContext, elizaLogger, generateText, getEmbeddingZeroVector, stringToUuid } from "@ai16z/eliza";
 import { ClientBase } from "./base";
-import { campaignRoomId, startedCampaignRoomId, sendBONKTxn, shillingTweets } from "./utils";
+import { campaignRoomId, completedCampaignRoomId, startedCampaignRoomId } from "./utils";
 import { Tweet } from "agent-twitter-client";
 import { truncateToCompleteSentence } from "./postCampaign";
+import { getBundledAction } from "lit-actions/src/utils.ts";
+import { LitWrapper } from "lit-wrapper-sdk";
+
+const litWrapper = new LitWrapper("datil-dev");
 
 
 const twitterPostTemplate = `
@@ -37,18 +41,25 @@ export class TwitterAccountBalanceClass {
     }
 
     async getStartedCampaigns() {
-        elizaLogger.log("checking started campaigns");
         const campaigns = await this.runtime.messageManager.getMemories({
             roomId: startedCampaignRoomId,
             count: 100,
             unique: false,
         });
 
-        // campaigns.map(item => this.distributeFunds(item))
+        campaigns.forEach((campaign) => {
+            const a = campaign.createdAt;
+            const b = Date.now();
+            const diff = Math.abs(b - a);
 
-        // elizaLogger.log("started campaigns", campaigns);
+            const minutes = diff / 1000;
 
+            const timeLimit = 60 * 5 ; // 5 minutes
 
+            if (minutes > timeLimit){
+                this.distributeFunds(campaign)
+            }
+        })
 
         return campaigns;
     }
@@ -70,8 +81,25 @@ export class TwitterAccountBalanceClass {
         return campaigns;
     }
 
+    async deleteData(){
+        const activeCampaigns = await this.getActiveCampaigns();
+
+        activeCampaigns.forEach(async (campaign) => {
+            await this.runtime.messageManager.removeMemory(campaign.id)
+        })
+
+        const startedCampaigns = await this.getStartedCampaigns();
+
+        startedCampaigns.forEach(async (campaign) => {
+            await this.runtime.messageManager.removeMemory(campaign.id)
+        })
+    }
+
     async distributeFunds(campaignMemory: Memory){
         const campaign: any = campaignMemory.content;
+
+        const shillingRoomId = stringToUuid("shilling-tweets-room" + "-" + campaignMemory.id);
+
         elizaLogger.log("Distributing funds for", campaign?.token);
         if (!campaign?.litWalletResult){
             elizaLogger.log("No distributor", campaign?.token);
@@ -79,7 +107,7 @@ export class TwitterAccountBalanceClass {
         }
 
         const applicants = await this.runtime.messageManager.getMemories({
-            roomId: shillingTweets,
+            roomId: shillingRoomId,
             count: 100,
             unique: false,
         });
@@ -89,11 +117,74 @@ export class TwitterAccountBalanceClass {
             return;
         }
 
-        applicants.map(memory => {
-            const tweet = memory.content;
-            const reward = parseFloat(campaign.bounty.replace(/[^\d.]/g, '')) / applicants.length;
-            sendBONKTxn(campaign?.litWalletResult, reward, tweet.userAddress as string, this.runtime.getSetting("LIT_EVM_PRIVATE_KEY") ).catch(error => console.log(error.message) )
+        function getRandomNumberBetween1And100() {
+            return Math.floor(Math.random() * 100) + 1;
+        }
+
+        // Just for testing I am introduging random number, because we can't simulate large number of posts. This must be removed in production.
+        const parsedData = applicants.map(memory => {
+            const content = memory.content;
+            const tweet: any = content.tweet;
+
+            return  {
+                username: tweet.username,
+                message: tweet.text,
+                impressions: tweet.impressions || getRandomNumberBetween1And100(),
+                likes: tweet.likes || getRandomNumberBetween1And100(),
+                retweets: tweet.retweets || getRandomNumberBetween1And100(),
+                followers: tweet.followers || getRandomNumberBetween1And100(),
+                timestamp: tweet.timestamp,
+                publicKey: content.userAddress,
+            }
         })
+          // const litActionCode = await getBundledAction("solana-transction");
+        const litActionCode = await getBundledAction("distribute-funds");
+          // const response = await litWrapper.createSolanaWK(LIT_EVM_PRIVATE_KEY);
+        const litWalletResult = campaign.litWalletResult;
+
+
+        elizaLogger.log("details", litWalletResult, parsedData);
+
+
+        if (!litWalletResult?.pkpInfo?.publicKey) {
+            throw new Error("PKP public key not found in response");
+        }
+
+        const privateKey = this.runtime.getSetting("LIT_EVM_PRIVATE_KEY");
+
+        if (!privateKey) {
+            elizaLogger.log("No private key found");
+            return;
+        }
+
+        const actionResult = await litWrapper.executeCustomActionOnSolana({
+            userPrivateKey: privateKey,
+            broadcastTransaction: true,
+            litActionCode,
+            pkp: litWalletResult?.pkpInfo,
+            wk: litWalletResult?.wkInfo,
+            params: {
+                openaiApiKey: this.runtime.getSetting("OPENAI_API_KEY") ,
+                publicKey: litWalletResult?.wkInfo.generatedPublicKey,
+                testTweets: parsedData,
+                totalAmount: parseFloat(campaign.bounty.replace(/[^\d.]/g, '') ?? 0) * 0.95, // 5% fee
+            },
+            litTransaction: ""
+        });
+
+        if (typeof actionResult?.response !== "string"){
+            throw new Error("Invalid return type")
+        }
+
+        if (actionResult?.response?.includes("Error")){
+            console.log("Error: ", actionResult);
+            return;
+        }
+
+        const hash = actionResult?.response;
+
+        await this.runtime.messageManager.createMemory({...campaignMemory, roomId: completedCampaignRoomId})
+        await this.runtime.messageManager.removeMemory(campaignMemory.id)
     }
 
     async start() {
@@ -103,7 +194,7 @@ export class TwitterAccountBalanceClass {
                     this.handleMonitorActiveCampaign(campaign);
                 });
             });
-            // this.getStartedCampaigns()
+            this.getStartedCampaigns()
             // this.handleTwitterInteractions();
             setTimeout(
                 handleTwitterInteractionsLoop,
@@ -111,6 +202,7 @@ export class TwitterAccountBalanceClass {
             );
         };
         handleTwitterInteractionsLoop();
+        // this.deleteData()
     }
 
     async handleMonitorActiveCampaign(campaignMemory: Memory) {
@@ -124,34 +216,40 @@ export class TwitterAccountBalanceClass {
         try {
             const receiverPublicKey = new PublicKey(campaign.publicKey);
 
-            const BONK_TOKEN_MINT =
-                "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"; // BONK token mint address
-            const tokenAccount = await getAssociatedTokenAddress(
-                new PublicKey(BONK_TOKEN_MINT),
-                receiverPublicKey
-            );
+            // const BONK_TOKEN_MINT =
+            //     "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"; // BONK token mint address
+            // const tokenAccount = await getAssociatedTokenAddress(
+            //     new PublicKey(BONK_TOKEN_MINT),
+            //     receiverPublicKey
+            // );
 
             const connection = new Connection(
-                "https://api.mainnet-beta.solana.com",
+                "https://api.devnet.solana.com/",
                 {
                     commitment: "confirmed",
                     confirmTransactionInitialTimeout: 500000,
                 }
             );
 
-            const balance = await connection.getTokenAccountBalance(
-                tokenAccount,
-                "processed"
-            );
-            const amount = balance.value.uiAmount;
+            // const balance = await connection.getTokenAccountBalance(
+            //     tokenAccount,
+            //     "processed"
+            // );
+
+            const balance = await connection.getBalance(receiverPublicKey);
+            const amount = balance / (10 ** 9);
+
+            // console.log("balance", balance)
+            // const amount = balance.value.uiAmount;
+            // const amount = balance;
             if (amount === null) {
                 console.log("No Account Found");
             } else {
-                console.log(`found:`, amount, campaign.bounty.replace(/[^\d.]/g, ''));
+                console.log(`found:`, amount, " out of ", campaign.bounty.replace(/[^\d.]/g, ''));
             }
 
             if (amount >= parseFloat(campaign.bounty.replace(/[^\d.]/g, ''))){
-            // if (true){
+                elizaLogger.log("Funds found for campaign", campaign?.token);
                 await this.generateNewTweet(campaign)
                 await this.runtime.messageManager.removeMemory(campaignMemory.id)
                 await this.runtime.messageManager.createMemory({...campaignMemory, roomId: startedCampaignRoomId})

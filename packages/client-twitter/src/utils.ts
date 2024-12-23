@@ -4,17 +4,16 @@ import { Content, Memory, UUID } from "@ai16z/eliza";
 import { stringToUuid } from "@ai16z/eliza";
 import { ClientBase } from "./base";
 import { elizaLogger } from "@ai16z/eliza";
-// import { LitWrapper } from "lit-wrapper-sdk";
+import { LitWrapper } from "lit-wrapper-sdk";
 
-// const litWrapper = new LitWrapper("datil-dev")
+const litWrapper = new LitWrapper("datil-dev")
 
 export async function generateSolanaWallet(
      LIT_EVM_PRIVATE_KEY: string,
 ) {
-    // const res = await litWrapper.createSolanaWK(LIT_EVM_PRIVATE_KEY);
-    // // console.log(res)
-    // // console.log("Solana Public Key", res.wkInfo.generatedPublicKey);
-    // return res
+    console.log("Generating solana wallet")
+    const res = await litWrapper.createSolanaWK(LIT_EVM_PRIVATE_KEY);
+    return res
 }
 
 export async function sendBONKTxn(res: any, amount: number, receiver: string, LIT_EVM_PRIVATE_KEY: string) {
@@ -357,7 +356,7 @@ function splitParagraph(paragraph: string, maxLength: number): string[] {
 }
 export const campaignRoomId = stringToUuid("campaigns-room");
 export const startedCampaignRoomId = stringToUuid("started-campaigns");
-export const completedCmapaignRoomId = stringToUuid("completed-campaigns");
+export const completedCampaignRoomId = stringToUuid("completed-campaigns");
 export const shillingTweets = stringToUuid("shilling-tweets-room");
 export async function saveCampaignMemory(
     client: ClientBase,

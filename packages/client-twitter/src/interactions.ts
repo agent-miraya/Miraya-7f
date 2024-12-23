@@ -208,7 +208,7 @@ Example response:
   "name": "Test Token",
   "token": "$USDC",     // The token symbol
   "slogan": "best memecoin in solana",    // Marketing slogan/tagline
-  "bounty": "10BONK",    // Reward amount
+  "bounty": "10SOL",    // Reward amount
   "duration": "1024"   // Campaign timeframe(in seconds), convert automatically from any given time window.
 }
 \`\`\`
@@ -225,7 +225,7 @@ Given the recent messages, extract or generate (come up with if not included) th
 - Token name
 - Token symbol
 - Token/campaign description  or slogan
-- Amount of tokens for bounty. Usually in crypto, likr 100BONK, or 1000USDC
+- Amount of tokens for bounty. Usually in crypto, like 100SOL, or 1000USDC
 
 Respond with a JSON markdown block containing only the extracted values.`;
 
@@ -454,12 +454,13 @@ export class TwitterInteractionClient {
 
             const userIdUUID = stringToUuid(tweet.userId as string);
 
+            const shillingRoomId = stringToUuid("shilling-tweets-room" + "-" + isShillingForCampaign.id);
+
             const transferContext = composeContext({
                 state,
                 template: transferTemplate,
             });
 
-            // Generate transfer content
             const content = await generateObject({
                 runtime: this.runtime,
                 context: transferContext,
@@ -481,7 +482,7 @@ export class TwitterInteractionClient {
                     campaign: isShillingForCampaign.id as string,
                 },
                 userId: userIdUUID,
-                roomId: shillingTweets,
+                roomId: shillingRoomId,
                 createdAt: tweet.timestamp * 1000,
                 embedding: getEmbeddingZeroVector(),
             };
@@ -489,31 +490,31 @@ export class TwitterInteractionClient {
 
             await this.runtime.messageManager.createMemory(message);
 
-            const hash = await distributeFunds(message, isShillingForCampaign, this.runtime.getSetting("LIT_EVM_PRIVATE_KEY"));
+            // const hash = await distributeFunds(message, isShillingForCampaign, this.runtime.getSetting("LIT_EVM_PRIVATE_KEY"));
 
-            // const hash = "5DX7bpncr7XKRKsoJ7UL8xq7R8E3KLrWJeXyz4GMUEnhjrhmKysQD8NXwmobKsMPvduBKvpZJLWgjHeV6nfDXNd4"
-            const link = `https://solscan.io/tx/${hash}`
+            // // const hash = "5DX7bpncr7XKRKsoJ7UL8xq7R8E3KLrWJeXyz4GMUEnhjrhmKysQD8NXwmobKsMPvduBKvpZJLWgjHeV6nfDXNd4"
+            // const link = `https://solscan.io/tx/${hash}`
 
-            const response: Content = {
-                text: `Thanks for participating in campaign. Bounty deposited on your sol address.\n\nTransaction hash: ${link}.`
-            }
+            // const response: Content = {
+            //     text: `Thanks for participating in campaign. Bounty deposited on your sol address.\n\nTransaction hash: ${link}.`
+            // }
 
-            const removeQuotes = (str: string) =>
-                str.replace(/^['"](.*)['"]$/, "$1");
+            // const removeQuotes = (str: string) =>
+            //     str.replace(/^['"](.*)['"]$/, "$1");
 
-            const stringId = stringToUuid(tweet.id + "-" + this.runtime.agentId);
+            // const stringId = stringToUuid(tweet.id + "-" + this.runtime.agentId);
 
-            response.inReplyTo = stringId;
+            // response.inReplyTo = stringId;
 
-            response.text = removeQuotes(response.text);
+            // response.text = removeQuotes(response.text);
 
-            const tweetmemory = await sendTweet(
-                this.client,
-                response,
-                stringToUuid(tweet.conversationId),
-                this.runtime.getSetting("TWITTER_USERNAME"),
-                tweet.id
-            );
+            // const tweetmemory = await sendTweet(
+            //     this.client,
+            //     response,
+            //     stringToUuid(tweet.conversationId),
+            //     this.runtime.getSetting("TWITTER_USERNAME"),
+            //     tweet.id
+            // );
 
             return;
         }

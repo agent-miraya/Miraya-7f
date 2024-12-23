@@ -5,7 +5,6 @@ import { IAgentRuntime, Client, elizaLogger } from "@ai16z/eliza";
 import { validateTwitterConfig } from "./environment.ts";
 import { ClientBase } from "./base.ts";
 import { TwitterAccountBalanceClass } from "./monitorAddress.ts";
-import { generateSolanaWallet } from "./utils.ts";
 
 class TwitterManager {
     client: ClientBase;
@@ -47,8 +46,6 @@ export const TwitterClientInterface: Client = {
         await manager.monitor.start();
 
         // await manager.post.start();
-
-
 
         await manager.interaction.start();
 

@@ -596,8 +596,8 @@ importers:
         specifier: workspace:*
         version: link:../lit-actions
       lit-wrapper-sdk:
-        specifier: ^0.1.1
-        version: 0.1.1(@simplewebauthn/browser@7.4.0)(@simplewebauthn/typescript-types@7.4.0)(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(date-and-time@2.4.3)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(multiformats@9.9.0)(tslib@2.8.1)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2)
+        specifier: ^0.1.2
+        version: 0.1.2(@simplewebauthn/browser@7.4.0)(@simplewebauthn/typescript-types@7.4.0)(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(date-and-time@2.4.3)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(multiformats@11.0.2)(tslib@2.8.1)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2)
       whatwg-url:
         specifier: 7.1.0
         version: 7.1.0
@@ -825,7 +825,7 @@ importers:
         version: 11.0.0
       lit-wrapper-sdk:
         specifier: ^0.1.1
-        version: 0.1.1(@simplewebauthn/browser@7.4.0)(@simplewebauthn/typescript-types@7.4.0)(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(date-and-time@2.4.3)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(multiformats@11.0.2)(tslib@2.8.1)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2)
+        version: 0.1.1(@simplewebauthn/browser@7.4.0)(@simplewebauthn/typescript-types@7.4.0)(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(date-and-time@2.4.3)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(multiformats@9.9.0)(tslib@2.8.1)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -11747,6 +11747,9 @@ packages:
 
   lit-wrapper-sdk@0.1.1:
     resolution: {integrity: sha512-7ZOBJHOmDZWDb3rJsFLdHzCjdvn21S6GO2HOjB+25rPFgAXUXMRUawa1f22hyk30t5m7C0RF1Rrl0WGlI48r5g==}
+
+  lit-wrapper-sdk@0.1.2:
+    resolution: {integrity: sha512-Us3qmkHoU3KU9BwbfDWpqYySoZSaCBuRs3UHBjbS2Wa/CFDKjCvHHNCcgTGoofAFwTUkdhHB87x3KDxkZhR5oA==}
 
   lit@2.7.6:
     resolution: {integrity: sha512-1amFHA7t4VaaDe+vdQejSVBklwtH9svGoG6/dZi9JhxtJBBlqY5D1RV7iLUYY0trCqQc4NfhYYZilZiVHt7Hxg==}
@@ -31603,11 +31606,11 @@ snapshots:
     dependencies:
       '@types/trusted-types': 2.0.7
 
-  lit-wrapper-sdk@0.1.1(@simplewebauthn/browser@7.4.0)(@simplewebauthn/typescript-types@7.4.0)(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(date-and-time@2.4.3)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(multiformats@11.0.2)(tslib@2.8.1)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2):
+  lit-wrapper-sdk@0.1.1(@simplewebauthn/browser@7.4.0)(@simplewebauthn/typescript-types@7.4.0)(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(date-and-time@2.4.3)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(multiformats@9.9.0)(tslib@2.8.1)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2):
     dependencies:
       '@lit-protocol/auth-helpers': 7.0.2(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@5.0.10)
       '@lit-protocol/constants': 7.0.2(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@5.0.10)
-      '@lit-protocol/contracts-sdk': 7.0.2(bufferutil@4.0.8)(date-and-time@2.4.3)(multiformats@11.0.2)(typescript@5.7.2)(utf-8-validate@5.0.10)
+      '@lit-protocol/contracts-sdk': 7.0.2(bufferutil@4.0.8)(date-and-time@2.4.3)(multiformats@9.9.0)(typescript@5.7.2)(utf-8-validate@5.0.10)
       '@lit-protocol/lit-auth-client': 7.0.2(@simplewebauthn/browser@7.4.0)(@simplewebauthn/typescript-types@7.4.0)(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2)
       '@lit-protocol/lit-node-client': 7.0.2(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(encoding@0.1.13)(tslib@2.8.1)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2)
       '@lit-protocol/lit-node-client-nodejs': 7.0.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.7.2)(utf-8-validate@5.0.10)
@@ -31649,11 +31652,11 @@ snapshots:
       - utf-8-validate
       - web-vitals
 
-  lit-wrapper-sdk@0.1.1(@simplewebauthn/browser@7.4.0)(@simplewebauthn/typescript-types@7.4.0)(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(date-and-time@2.4.3)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(multiformats@9.9.0)(tslib@2.8.1)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2):
+  lit-wrapper-sdk@0.1.2(@simplewebauthn/browser@7.4.0)(@simplewebauthn/typescript-types@7.4.0)(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(date-and-time@2.4.3)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(multiformats@11.0.2)(tslib@2.8.1)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2):
     dependencies:
       '@lit-protocol/auth-helpers': 7.0.2(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@5.0.10)
       '@lit-protocol/constants': 7.0.2(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@5.0.10)
-      '@lit-protocol/contracts-sdk': 7.0.2(bufferutil@4.0.8)(date-and-time@2.4.3)(multiformats@9.9.0)(typescript@5.7.2)(utf-8-validate@5.0.10)
+      '@lit-protocol/contracts-sdk': 7.0.2(bufferutil@4.0.8)(date-and-time@2.4.3)(multiformats@11.0.2)(typescript@5.7.2)(utf-8-validate@5.0.10)
       '@lit-protocol/lit-auth-client': 7.0.2(@simplewebauthn/browser@7.4.0)(@simplewebauthn/typescript-types@7.4.0)(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2)
       '@lit-protocol/lit-node-client': 7.0.2(@walletconnect/modal@2.6.1(react@18.3.1))(bufferutil@4.0.8)(encoding@0.1.13)(tslib@2.8.1)(typescript@5.7.2)(utf-8-validate@5.0.10)(web-vitals@3.5.2)
       '@lit-protocol/lit-node-client-nodejs': 7.0.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.7.2)(utf-8-validate@5.0.10)

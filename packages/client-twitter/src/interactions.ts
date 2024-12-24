@@ -17,7 +17,7 @@ import {
     generateObject,
 } from "@ai16z/eliza";
 import { ClientBase } from "./base";
-import { buildConversationThread, distributeFunds, generateSolanaWallet, saveCampaignMemory, sendTweet, shillingTweets, startedCampaignRoomId, wait } from "./utils.ts";
+import { buildConversationThread, campaignRoomId, generateSolanaWallet, handleAgentQuery, saveCampaignMemory, sendTweet, shillingTweets, startedCampaignRoomId, wait } from "./utils.ts";
 
 export const twitterMessageHandlerTemplate =
     `
@@ -437,7 +437,56 @@ export class TwitterInteractionClient {
             unique: false,
         });
 
-        console.log("startedCampaigns", startedCampaigns)
+        const notstartedCampaigns = await this.runtime.messageManager.getMemories({
+            roomId: campaignRoomId,
+            count: 100,
+            unique: false,
+        })
+
+        const isAgentQuery = [...startedCampaigns, ...notstartedCampaigns].find(memory => {
+            if (memory.content.conversationId && tweet.conversationId === memory.content.conversationId){
+                return memory
+            }
+
+            return false
+        })
+
+        if (isAgentQuery){
+            if (tweet.username !== isAgentQuery.content.username){
+                elizaLogger.log("Invalid user for wallet prompt.");
+                return;
+            }
+            elizaLogger.log("This is a prompt tweet.");
+            const promptMessage = tweet.text;
+
+            const promptAnswer = await handleAgentQuery(isAgentQuery, promptMessage, this.client);
+
+            const response: Content = {
+                text: promptAnswer
+            }
+
+
+            const stringId = stringToUuid(tweet.id + "-" + this.runtime.agentId);
+
+            response.inReplyTo = stringId;
+
+            const removeQuotes = (str: string) =>
+                str.replace(/^['"](.*)['"]$/, "$1");
+
+            response.text = removeQuotes(response.text);
+
+            await sendTweet(
+                this.client,
+                response,
+                stringToUuid(tweet.conversationId),
+                this.runtime.getSetting("TWITTER_USERNAME"),
+                tweet.id
+            );
+
+            return;
+        }
+
+
 
         const isShillingForCampaign = startedCampaigns.find(memory => {
             if (memory.content.token && tweet.text.includes(memory.content.token as string)){
@@ -556,7 +605,10 @@ export class TwitterInteractionClient {
         const litWalletResult = await generateSolanaWallet(this.runtime.getSetting("LIT_EVM_PRIVATE_KEY"),)
 
         campaignDetails.publicKey = litWalletResult.wkInfo.generatedPublicKey;
-        campaignDetails.litWalletResult = litWalletResult
+        campaignDetails.litWalletResult = litWalletResult;
+
+        campaignDetails.username = tweet.username;
+        campaignDetails.conversationId = tweet.conversationId;
 
         const roomId = stringToUuid(
             tweet.conversationId + "-" + this.client.runtime.agentId

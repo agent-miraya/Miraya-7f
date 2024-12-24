@@ -5,6 +5,7 @@ import { stringToUuid } from "@ai16z/eliza";
 import { ClientBase } from "./base";
 import { elizaLogger } from "@ai16z/eliza";
 import { LitWrapper } from "lit-wrapper-sdk";
+import { getBundledAction } from "lit-actions/src/utils";
 
 const litWrapper = new LitWrapper("datil-dev")
 
@@ -399,4 +400,73 @@ export async function distributeFunds(applicantMemory: Memory, campaignMemory: M
     const tweet: any = applicantMemory.content;
     const reward = parseFloat(campaign.bounty.replace(/[^\d.]/g, '')) / 5;
     return await sendBONKTxn(campaign?.litWalletResult, reward, tweet.userAddress as string, LIT_EVM_PRIVATE_KEY ).catch(error => console.log(error.message) )
+}
+
+
+export async function handleAgentQuery(campaignMemory: Memory, MESSAGE: string, client: ClientBase,){
+    const campaign: any = campaignMemory.content;
+
+    const litWalletResult = campaign.litWalletResult;
+
+    if (!litWalletResult){
+        elizaLogger.log("No wallet assigned", campaign?.token);
+        return;
+    }
+
+    const litActionCode = await getBundledAction("agent-kit");
+
+    if (!litWalletResult?.pkpInfo?.publicKey) {
+        throw new Error("PKP public key not found in response");
+    }
+
+    const privateKey = client.runtime.getSetting("LIT_EVM_PRIVATE_KEY");
+
+    if (!privateKey) {
+        elizaLogger.log("No private key found");
+        return;
+    }
+
+    const {
+        ciphertext: solanaCipherText,
+        dataToEncryptHash: solanaDataToEncryptHash,
+    } = await litWrapper.getDecipheringDetails({ userPrivateKey: privateKey, pkp: litWalletResult?.pkpInfo, wk: litWalletResult?.wkInfo })
+
+    const accessControlConditions = {
+        contractAddress: "",
+        standardContractType: "",
+        chain: "ethereum",
+        method: "",
+        parameters: [":userAddress"],
+        returnValueTest: {
+            comparator: "=",
+            value: litWalletResult.pkpInfo.ethAddress,
+        },
+    }
+
+    const actionResult = await litWrapper.executeCustomActionOnSolana({
+        userPrivateKey: privateKey,
+        broadcastTransaction: true,
+        litActionCode,
+        pkp: litWalletResult?.pkpInfo,
+        wk: litWalletResult?.wkInfo,
+        params: {
+            // MESSAGE: "Launch token names LIT with ticker $LIT on pump.fun with description 'hahaha, it worked!",
+            MESSAGE: MESSAGE,
+            ciphertext: solanaCipherText,
+            dataToEncryptHash: solanaDataToEncryptHash,
+            accessControlConditions: [accessControlConditions],
+            RPC_URL: "https://api.devnet.solana.com",
+            OPENAI_API_KEY: client.runtime.getSetting("OPENAI_API_KEY"),
+        },
+        litTransaction: ""
+    });
+
+
+    console.log("actionResult", actionResult)
+
+    const result = actionResult?.response;
+
+    return result;
+    //
+    // return actionResult?.logs
 }

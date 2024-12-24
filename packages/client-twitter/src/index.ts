@@ -40,7 +40,6 @@ export const TwitterClientInterface: Client = {
         elizaLogger.log("Twitter client started");
 
         const manager = new TwitterManager(runtime);
-
         await manager.client.init();
 
         await manager.monitor.start();

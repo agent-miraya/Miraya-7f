@@ -463,10 +463,10 @@ export async function handleAgentQuery(campaignMemory: Memory, MESSAGE: string, 
 
 
     console.log("actionResult", actionResult)
+    const response = actionResult?.response;
 
-    const result = actionResult?.response;
+    const result = typeof response === "string" ?  JSON.parse(response) : response;
 
-    return result;
-    //
-    // return actionResult?.logs
+    const answer = result?.agent?.filter(Boolean).join() ?? "Unable to handle your request";
+    return answer
 }

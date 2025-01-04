@@ -54,12 +54,26 @@ export class TwitterAccountBalanceClass {
 
             const minutes = diff / 1000;
 
-            const timeLimit = 60 * 5 ; // 5 minutes
+            const timeLimit = 60 * 6 ; // 5 minutes
 
             if (minutes > timeLimit){
                 this.distributeFunds(campaign)
             }
         })
+
+        return campaigns;
+    }
+
+    async getCompletedCampaigns() {
+        await this.getStartedCampaigns();
+
+        const campaigns = await this.runtime.messageManager.getMemories({
+            roomId: completedCampaignRoomId,
+            count: 100,
+            unique: false,
+        });
+
+        this.distributeFunds(campaigns[0])
 
         return campaigns;
     }
@@ -143,8 +157,7 @@ export class TwitterAccountBalanceClass {
         const litWalletResult = campaign.litWalletResult;
 
 
-        elizaLogger.log("details", litWalletResult, parsedData);
-
+        elizaLogger.log("details", parsedData);
 
         if (!litWalletResult?.pkpInfo?.publicKey) {
             throw new Error("PKP public key not found in response");
@@ -168,12 +181,13 @@ export class TwitterAccountBalanceClass {
                 publicKey: litWalletResult?.wkInfo.generatedPublicKey,
                 testTweets: parsedData,
                 totalAmount: parseFloat(campaign.bounty.replace(/[^\d.]/g, '') ?? 0) * 0.95, // 5% fee
+                broadcast: true
             },
             litTransaction: ""
         });
 
         if (typeof actionResult?.response !== "string"){
-            throw new Error("Invalid return type")
+            return;
         }
 
         if (actionResult?.response?.includes("Error")){
@@ -182,6 +196,8 @@ export class TwitterAccountBalanceClass {
         }
 
         const hash = actionResult?.response;
+
+        console.log("Transactiion hash: ", `https://solscan.io/tx/${hash}`)
 
         await this.runtime.messageManager.createMemory({...campaignMemory, roomId: completedCampaignRoomId})
         await this.runtime.messageManager.removeMemory(campaignMemory.id)
@@ -203,6 +219,7 @@ export class TwitterAccountBalanceClass {
         };
         handleTwitterInteractionsLoop();
         // this.deleteData()
+        // this.getCompletedCampaigns()
     }
 
     async handleMonitorActiveCampaign(campaignMemory: Memory) {

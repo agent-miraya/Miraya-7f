@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:969](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L969)
+[packages/core/src/types.ts:969](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L969)
 
 ## Methods
 
@@ -48,7 +48,7 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:974](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L974)
+[packages/core/src/types.ts:974](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L974)
 
 ***
 
@@ -62,7 +62,7 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1117](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L1117)
+[packages/core/src/types.ts:1117](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L1117)
 
 ***
 
@@ -80,4 +80,4 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1118](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L1118)
+[packages/core/src/types.ts:1118](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L1118)

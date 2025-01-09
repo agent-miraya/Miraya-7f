@@ -44,4 +44,4 @@ const context = composeContext({ state, template });
 
 ## Defined in
 
-[packages/core/src/context.ts:24](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/context.ts#L24)
+[packages/core/src/context.ts:24](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/context.ts#L24)

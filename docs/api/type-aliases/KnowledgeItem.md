@@ -16,4 +16,4 @@
 
 ## Defined in
 
-[packages/core/src/types.ts:1155](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L1155)
+[packages/core/src/types.ts:1155](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L1155)

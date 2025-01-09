@@ -20,4 +20,4 @@
 
 ## Defined in
 
-[packages/core/src/posts.ts:4](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/posts.ts#L4)
+[packages/core/src/posts.ts:4](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/posts.ts#L4)

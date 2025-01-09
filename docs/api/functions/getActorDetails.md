@@ -20,4 +20,4 @@ Get details for a list of actors.
 
 ## Defined in
 
-[packages/core/src/messages.ts:12](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/messages.ts#L12)
+[packages/core/src/messages.ts:12](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/messages.ts#L12)

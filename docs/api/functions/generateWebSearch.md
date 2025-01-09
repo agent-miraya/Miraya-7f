@@ -16,4 +16,4 @@
 
 ## Defined in
 
-[packages/core/src/generation.ts:1022](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/generation.ts#L1022)
+[packages/core/src/generation.ts:1022](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/generation.ts#L1022)

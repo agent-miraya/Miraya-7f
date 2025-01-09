@@ -8,4 +8,4 @@ Initialize settings based on environment
 
 ## Defined in
 
-[packages/core/src/settings.ts:126](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/settings.ts#L126)
+[packages/core/src/settings.ts:126](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/settings.ts#L126)

@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:969](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L969)
+[packages/core/src/types.ts:969](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L969)
 
 ## Methods
 
@@ -48,7 +48,7 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:974](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L974)
+[packages/core/src/types.ts:974](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L974)
 
 ***
 
@@ -66,7 +66,7 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1067](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L1067)
+[packages/core/src/types.ts:1067](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L1067)
 
 ***
 
@@ -84,7 +84,7 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1068](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L1068)
+[packages/core/src/types.ts:1068](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L1068)
 
 ***
 
@@ -102,7 +102,7 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1071](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L1071)
+[packages/core/src/types.ts:1071](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L1071)
 
 ***
 
@@ -120,4 +120,4 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1072](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L1072)
+[packages/core/src/types.ts:1072](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L1072)

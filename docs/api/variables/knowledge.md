@@ -52,4 +52,4 @@
 
 ## Defined in
 
-[packages/core/src/knowledge.ts:150](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/knowledge.ts#L150)
+[packages/core/src/knowledge.ts:150](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/knowledge.ts#L150)

@@ -22,4 +22,4 @@ string
 
 ## Defined in
 
-[packages/core/src/messages.ts:60](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/messages.ts#L60)
+[packages/core/src/messages.ts:60](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/messages.ts#L60)

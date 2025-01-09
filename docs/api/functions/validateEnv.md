@@ -12,4 +12,4 @@ Validation function
 
 ## Defined in
 
-[packages/core/src/environment.ts:26](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/environment.ts#L26)
+[packages/core/src/environment.ts:26](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/environment.ts#L26)

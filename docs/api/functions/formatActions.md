@@ -20,4 +20,4 @@ A detailed string of actions, including names and descriptions.
 
 ## Defined in
 
-[packages/core/src/actions.ts:73](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/actions.ts#L73)
+[packages/core/src/actions.ts:73](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/actions.ts#L73)

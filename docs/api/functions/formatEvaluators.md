@@ -20,4 +20,4 @@ A string that concatenates the name and description of each evaluator, separated
 
 ## Defined in
 
-[packages/core/src/evaluators.ts:41](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/evaluators.ts#L41)
+[packages/core/src/evaluators.ts:41](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/evaluators.ts#L41)

@@ -20,4 +20,4 @@ A string that concatenates the names of all evaluators, each enclosed in single 
 
 ## Defined in
 
-[packages/core/src/evaluators.ts:30](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/evaluators.ts#L30)
+[packages/core/src/evaluators.ts:30](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/evaluators.ts#L30)

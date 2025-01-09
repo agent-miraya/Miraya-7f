@@ -10,4 +10,4 @@
 
 ## Defined in
 
-[packages/core/src/embedding.ts:118](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/embedding.ts#L118)
+[packages/core/src/embedding.ts:118](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/embedding.ts#L118)

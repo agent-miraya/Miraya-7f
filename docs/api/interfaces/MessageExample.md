@@ -14,7 +14,7 @@ Associated user
 
 #### Defined in
 
-[packages/core/src/types.ts:357](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L357)
+[packages/core/src/types.ts:357](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L357)
 
 ***
 
@@ -26,4 +26,4 @@ Message content
 
 #### Defined in
 
-[packages/core/src/types.ts:360](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L360)
+[packages/core/src/types.ts:360](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L360)

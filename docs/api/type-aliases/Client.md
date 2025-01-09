@@ -38,4 +38,4 @@ Stop client connection
 
 ## Defined in
 
-[packages/core/src/types.ts:563](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L563)
+[packages/core/src/types.ts:563](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L563)

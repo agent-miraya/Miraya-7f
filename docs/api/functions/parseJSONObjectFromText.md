@@ -24,4 +24,4 @@ An object parsed from the JSON string if successful; otherwise, null or the resu
 
 ## Defined in
 
-[packages/core/src/parsing.ts:103](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/parsing.ts#L103)
+[packages/core/src/parsing.ts:103](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/parsing.ts#L103)

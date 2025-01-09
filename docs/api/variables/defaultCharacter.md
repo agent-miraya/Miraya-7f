@@ -6,4 +6,4 @@
 
 ## Defined in
 
-[packages/core/src/defaultCharacter.ts:3](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/defaultCharacter.ts#L3)
+[packages/core/src/defaultCharacter.ts:3](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/defaultCharacter.ts#L3)

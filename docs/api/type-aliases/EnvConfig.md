@@ -8,4 +8,4 @@ Type inference
 
 ## Defined in
 
-[packages/core/src/environment.ts:23](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/environment.ts#L23)
+[packages/core/src/environment.ts:23](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/environment.ts#L23)

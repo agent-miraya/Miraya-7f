@@ -20,4 +20,4 @@ A string that summarizes the descriptions for each evaluator example, formatted 
 
 ## Defined in
 
-[packages/core/src/evaluators.ts:110](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/evaluators.ts#L110)
+[packages/core/src/evaluators.ts:110](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/evaluators.ts#L110)

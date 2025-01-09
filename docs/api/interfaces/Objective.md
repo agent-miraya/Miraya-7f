@@ -14,7 +14,7 @@ Optional unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:87](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L87)
+[packages/core/src/types.ts:87](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L87)
 
 ***
 
@@ -26,7 +26,7 @@ Description of what needs to be achieved
 
 #### Defined in
 
-[packages/core/src/types.ts:90](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L90)
+[packages/core/src/types.ts:90](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L90)
 
 ***
 
@@ -38,4 +38,4 @@ Whether objective is completed
 
 #### Defined in
 
-[packages/core/src/types.ts:93](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/types.ts#L93)
+[packages/core/src/types.ts:93](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/types.ts#L93)

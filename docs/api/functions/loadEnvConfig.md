@@ -19,4 +19,4 @@ If no .env file is found in Node.js environment
 
 ## Defined in
 
-[packages/core/src/settings.ts:79](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/settings.ts#L79)
+[packages/core/src/settings.ts:79](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/settings.ts#L79)

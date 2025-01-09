@@ -20,4 +20,4 @@ A comma-separated string of action names.
 
 ## Defined in
 
-[packages/core/src/actions.ts:61](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/actions.ts#L61)
+[packages/core/src/actions.ts:61](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/actions.ts#L61)

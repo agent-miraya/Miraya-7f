@@ -39,4 +39,4 @@ const text = addHeader(header, body);
 
 ## Defined in
 
-[packages/core/src/context.ts:58](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/context.ts#L58)
+[packages/core/src/context.ts:58](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/context.ts#L58)

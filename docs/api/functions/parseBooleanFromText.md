@@ -14,4 +14,4 @@
 
 ## Defined in
 
-[packages/core/src/parsing.ts:36](https://github.com/solana-autonomous-agents/Miraya/blob/main/packages/core/src/parsing.ts#L36)
+[packages/core/src/parsing.ts:36](https://github.com/agent-miraya/Miraya-7f/blob/main/packages/core/src/parsing.ts#L36)

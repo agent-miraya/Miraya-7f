@@ -5,13 +5,15 @@ import { IAgentRuntime, Client, elizaLogger } from "@ai16z/eliza";
 import { validateTwitterConfig } from "./environment.ts";
 import { ClientBase } from "./base.ts";
 import { TwitterAccountBalanceClass } from "./monitorAddress.ts";
+import { TwitterSnapshotClient } from "./snapshot.ts";
 
 class TwitterManager {
     client: ClientBase;
     post: TwitterPostClient;
     search: TwitterSearchClient;
     interaction: TwitterInteractionClient;
-    monitor: TwitterAccountBalanceClass
+    monitor: TwitterAccountBalanceClass;
+    snapshot: TwitterSnapshotClient;
     // monitor:
     constructor(runtime: IAgentRuntime) {
         this.client = new ClientBase(runtime);
@@ -20,6 +22,7 @@ class TwitterManager {
         // this searches topics from character file, but kind of violates consent of random users
         // burns your rate limit and can get your account banned
         // use at your own risk
+        this.snapshot = new TwitterSnapshotClient(this.client, runtime);
         this.interaction = new TwitterInteractionClient(this.client, runtime);
         this.monitor = new TwitterAccountBalanceClass(this.client, runtime);
 
@@ -42,11 +45,14 @@ export const TwitterClientInterface: Client = {
         const manager = new TwitterManager(runtime);
         await manager.client.init();
 
-        await manager.monitor.start();
+        // await manager.snapshot.test()
+        await manager.snapshot.handleSnapshots()
+
+        // await manager.monitor.start();
 
         // await manager.post.start();
 
-        await manager.interaction.start();
+        // await manager.interaction.start();
 
         return manager;
     },

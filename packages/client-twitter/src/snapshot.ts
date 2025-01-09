@@ -1,70 +1,78 @@
-import { Tweet } from "agent-twitter-client";
+import { SearchMode, Tweet } from "agent-twitter-client";
 import {
-    composeContext,
-    generateText,
     getEmbeddingZeroVector,
     IAgentRuntime,
     ModelClass,
     stringToUuid,
     parseBooleanFromText,
+    generateObject,
 } from "@ai16z/eliza";
 import { elizaLogger } from "@ai16z/eliza";
 import { ClientBase } from "./base.ts";
 
-const twitterPostTemplate = `
-# Areas of Expertise
-{{knowledge}}
-
-# About {{agentName}} (@{{twitterUserName}}):
-{{bio}}
-{{lore}}
-{{topics}}
-
-{{providers}}
-
-{{characterPostExamples}}
-
-{{postDirections}}
-
-# Task: Generate a post in the voice and style and perspective of {{agentName}} @{{twitterUserName}}.
-Write a 1-3 sentence post that is {{adjective}} about {{topic}} (without mentioning {{topic}} directly), from the perspective of {{agentName}}. Do not add commentary or acknowledge this request, just write the post.
-Your response should not contain any questions. Brief, concise statements only. The total character count MUST be less than 280. No emojis. Use \\n\\n (double spaces) between statements.`;
-
-const MAX_TWEET_LENGTH = 280;
-
-/**
- * Truncate text to fit within the Twitter character limit, ensuring it ends at a complete sentence.
- */
-function truncateToCompleteSentence(text: string): string {
-    if (text.length <= MAX_TWEET_LENGTH) {
-        return text;
-    }
-
-    // Attempt to truncate at the last period within the limit
-    const truncatedAtPeriod = text.slice(
-        0,
-        text.lastIndexOf(".", MAX_TWEET_LENGTH) + 1
-    );
-    if (truncatedAtPeriod.trim().length > 0) {
-        return truncatedAtPeriod.trim();
-    }
-
-    // If no period is found, truncate to the nearest whitespace
-    const truncatedAtSpace = text.slice(
-        0,
-        text.lastIndexOf(" ", MAX_TWEET_LENGTH)
-    );
-    if (truncatedAtSpace.trim().length > 0) {
-        return truncatedAtSpace.trim() + "...";
-    }
-
-    // Fallback: Hard truncate and add ellipsis
-    return text.slice(0, MAX_TWEET_LENGTH - 3).trim() + "...";
-}
-
-export class TwitterPostClient {
+export class TwitterSnapshotClient {
     client: ClientBase;
     runtime: IAgentRuntime;
+
+    constructor(client: ClientBase, runtime: IAgentRuntime) {
+        this.client = client;
+        this.runtime = runtime;
+    }
+
+    async getQualityScores(allTweets: Tweet[]) {
+        const payload = allTweets.map((item) => ({
+            text: item.text,
+            id: item.id,
+        }));
+
+        const systemPrompt = `
+          You are a tweet scoring robot.
+
+          You have to score the tweets that are meant to promote this project-
+
+          <project>
+            Miraya 7f - Autonomous Campaigning Agent, launch campaigns and reward shillers.
+
+            7f is an X agent, any user can tag @miraya7f with a prompt for campaign duration, token's ticker, amount, and number of winners. The agent will launch a campaign and reply with an escrow address to the user's tweet.
+
+            Once the User funds the address with the said amount, those funds get locked on the address (TEE). Miraya will announce the campaign on its official handle with the campaign-specific hashtag, this will let the users start posting content around campaign-specific tokens using the hashtag.
+
+            Miraya's AI runs a Snapshooter to capture all the activities over the campaign-specific hashtag and inferences over them to compute results.
+
+            Post activities are taken into account:
+
+            There's a community airdrop also going on, so projects may promote the airdrop to get more engagement.
+
+            Engaging users to follow our handle @miraya7f and Telegram is a positive sign.
+          <project>
+
+          <rules>
+            You have to score 1 to 100 points to the list of users tweets.
+            Analyze the tweet data and allocate amounts to influencers based on their tweet quality.
+            The Quality of Text is assessed using an AI-driven evaluation system- Insightfulness, Grammar & Structure, and Engagement Context(encouraging meaningful engagement, flagged by AI for non-clickbait content)
+            The max point should be 100 and min should be 0.
+            The text can be in any language. There is no language constrain. For non-english text, Grammar & Structure can be ignored.
+            The fairness should be key. The distribution should be based on the quality of the tweet.
+            The goal of tweet can be to promote the project, airdrop, or campaign.
+          <rules>
+
+
+          Return ONLY a JSON array of objects with tweet id and score fields.
+          The result should be fair and square. No negative points.
+          Example output format: [{"id": "12123213", "points": 60}, {"id": "1678", "points":  40}].
+          The key of JSON will be scores
+
+          Tweet Data: ${JSON.stringify(payload)}.
+        `;
+
+        const scores = await generateObject({
+            runtime: this.runtime,
+            context: systemPrompt,
+            modelClass: ModelClass.LARGE,
+        });
+
+        return scores;
+    }
 
     async start(postImmediately: boolean = false) {
         if (!this.client.profile) {
@@ -91,7 +99,7 @@ export class TwitterPostClient {
             const delay = randomMinutes * 60 * 1000;
 
             if (Date.now() > lastPostTimestamp + delay) {
-                await this.generateNewTweet();
+                await this.handleSnapshots();
             }
 
             setTimeout(() => {
@@ -109,23 +117,18 @@ export class TwitterPostClient {
             );
         }
         if (postImmediately) {
-            this.generateNewTweet();
+            this.handleSnapshots();
         }
 
         generateNewTweetLoop();
     }
 
-    constructor(client: ClientBase, runtime: IAgentRuntime) {
-        this.client = client;
-        this.runtime = runtime;
-    }
-
-    private async generateNewTweet() {
-        elizaLogger.log("Generating new tweet");
+    private async postTweet(content: string) {
+        elizaLogger.log("Posting new tweet");
 
         try {
             const roomId = stringToUuid(
-                "twitter_generate_room-" + this.client.profile.username
+                "twitter_snapshot_room-" + this.client.profile.username
             );
             await this.runtime.ensureUserExists(
                 this.runtime.agentId,
@@ -133,45 +136,6 @@ export class TwitterPostClient {
                 this.runtime.character.name,
                 "twitter"
             );
-
-            const topics = this.runtime.character.topics.join(", ");
-            const state = await this.runtime.composeState(
-                {
-                    userId: this.runtime.agentId,
-                    roomId: roomId,
-                    agentId: this.runtime.agentId,
-                    content: {
-                        text: topics,
-                        action: "",
-                    },
-                },
-                {
-                    twitterUserName: this.client.profile.username,
-                }
-            );
-
-            const context = composeContext({
-                state,
-                template:
-                    this.runtime.character.templates?.twitterPostTemplate ||
-                    twitterPostTemplate,
-            });
-
-            elizaLogger.debug("generate post prompt:\n" + context);
-
-            const newTweetContent = await generateText({
-                runtime: this.runtime,
-                context,
-                modelClass: ModelClass.SMALL,
-            });
-
-            // Replace \n with proper line breaks and trim excess spaces
-            const formattedTweet = newTweetContent
-                .replaceAll(/\\n/g, "\n")
-                .trim();
-
-            // Use the helper function to truncate to complete sentence
-            const content = truncateToCompleteSentence(formattedTweet);
 
             if (this.runtime.getSetting("TWITTER_DRY_RUN") === "true") {
                 elizaLogger.info(
@@ -187,11 +151,14 @@ export class TwitterPostClient {
                     async () =>
                         await this.client.twitterClient.sendTweet(content)
                 );
+
                 const body = await result.json();
+
                 if (!body?.data?.create_tweet?.tweet_results?.result) {
                     console.error("Error sending tweet; Bad response:", body);
                     return;
                 }
+
                 const tweetResult = body.data.create_tweet.tweet_results.result;
 
                 const tweet = {
@@ -239,7 +206,7 @@ export class TwitterPostClient {
                     userId: this.runtime.agentId,
                     agentId: this.runtime.agentId,
                     content: {
-                        text: newTweetContent.trim(),
+                        text: content,
                         url: tweet.permanentUrl,
                         source: "twitter",
                     },
@@ -253,5 +220,109 @@ export class TwitterPostClient {
         } catch (error) {
             elizaLogger.error("Error generating new tweet:", error);
         }
+    }
+
+    async handleSnapshots() {
+        let cursor: string;
+        const fetchedCursors = [];
+        const allTweets: Tweet[] = [];
+
+        while (true) {
+            console.log("fetching cursor", cursor);
+            await new Promise((resolve) =>
+                setTimeout(resolve, 5000 + Math.random() * 5000)
+            );
+
+            const recentTweets = await this.client.fetchSearchTweets(
+                "#miraya7f",
+                20,
+                SearchMode.Latest,
+                cursor
+            );
+
+            // console.log("recentTweets", recentTweets.tweets.length, recentTweets.next, recentTweets.previous )
+
+            cursor = recentTweets.next;
+            fetchedCursors.push(cursor);
+
+            allTweets.push(...recentTweets.tweets);
+            if (recentTweets.tweets.length < 1) {
+                break;
+            }
+        }
+
+        const scores = await this.getLeaderboard(allTweets);
+
+        const leaderboard = scores.slice(0, 10);
+
+        const tweetTemplate = `
+Snapshooter: Below is the leaderboard for accounts using our hashtag #miraya7f 🚀
+
+${leaderboard
+    .map((item, index) => {
+        return `${index + 1}. @${item.username}`;
+    })
+    .join("\n")}
+        `;
+
+        await this.postTweet(tweetTemplate);
+    }
+
+    private async calculatePointScore(allTweets: Tweet[]) {
+        const qualityScores: { id: string; points: number }[] =
+            await this.getQualityScores(allTweets);
+
+        const scores = {
+            impressions: 0.01, // 1 point per 100 impressions
+            likes: 1,
+            retweets: 4,
+            replies: 2,
+        };
+
+        const scoredTweets = allTweets.map((tweet) => {
+            let pointScore = 0;
+
+            pointScore += tweet.views * scores.impressions;
+            pointScore += tweet.likes * scores.likes;
+            pointScore += tweet.retweets * scores.retweets;
+            pointScore += tweet.replies * scores.replies;
+
+            const qualityScore =
+                qualityScores.find((item) => item.id === tweet.id).points || 0;
+
+            const qualityScoreMultiplier = 1 + qualityScore / 100;
+            const score = pointScore * qualityScoreMultiplier;
+
+            return { tweet, score };
+        });
+
+        return scoredTweets;
+    }
+
+    private async getLeaderboard(tweets: Tweet[]) {
+        const filteredTweets = tweets.filter((tweet) => {
+            return tweet.username !== "miraya7f";
+        });
+
+        const scoredTweets = await this.calculatePointScore(filteredTweets);
+
+        const userScores = scoredTweets.reduce((acc, { tweet, score }) => {
+            if (!acc[tweet.username]) {
+                acc[tweet.username] = 0;
+            }
+            acc[tweet.username] += score;
+            return acc;
+        }, {});
+
+        const userScoresArray = Object.entries(userScores).map((item) => {
+            return {
+                username: item[0],
+                score: item[1] as number,
+            };
+        });
+
+        const sortedScores = userScoresArray.sort((a, b) => b.score - a.score);
+
+        return sortedScores;
     }
 }

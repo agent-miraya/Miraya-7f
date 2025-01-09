@@ -5,14 +5,18 @@
     "type": "module",
     "types": "dist/index.d.ts",
     "dependencies": {
-        "lit-actions": "workspace:*",
         "@ai16z/eliza": "workspace:*",
-        "agent-twitter-client": "0.0.16",
-        "glob": "11.0.0",
-        "zod": "3.23.8",
         "@solana/spl-token": "0.4.9",
         "@solana/web3.js": "1.95.8",
-        "lit-wrapper-sdk": "^0.1.2"
+        "agent-twitter-client": "0.0.16",
+        "glob": "11.0.0",
+        "got": "^14.4.5",
+        "lit-actions": "workspace:*",
+        "lit-wrapper-sdk": "^0.1.2",
+        "oauth": "^0.10.0",
+        "oauth-1.0a": "^2.2.6",
+        "twitter-api-v2": "^1.19.0",
+        "zod": "3.23.8"
     },
     "devDependencies": {
         "tsup": "8.3.5"

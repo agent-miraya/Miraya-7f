@@ -1,5 +1,5 @@
 
-📖 [Documentation](docs.miraya7f.com) | 🎯 [X](https://x.com/miraya7f)
+📖 [Documentation](https://docs.miraya7f.com) | 🎯 [X](https://x.com/miraya7f)
 
 # Miraya 7f
 

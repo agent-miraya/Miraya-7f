@@ -607,6 +607,9 @@ importers:
       oauth-1.0a:
         specifier: ^2.2.6
         version: 2.2.6
+      pg:
+        specifier: 8.13.1
+        version: 8.13.1
       twitter-api-v2:
         specifier: ^1.19.0
         version: 1.19.0

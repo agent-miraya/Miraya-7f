@@ -9,6 +9,36 @@ import {
 } from "@ai16z/eliza";
 import { elizaLogger } from "@ai16z/eliza";
 import { ClientBase } from "./base.ts";
+import * as fs from "fs";
+import { query } from "./database";
+
+async function saveLeaderboardResults(
+    campaignId: string,
+    leaderboard: { username: string; score: number }[]
+) {
+    const leaderboardData = leaderboard.map((item, index) => ({
+        campaignId,
+        rank: index + 1,
+        username: item.username,
+        score: parseFloat(String(item.score)),
+    }));
+
+    await query("DELETE FROM leaderboard WHERE campaign_id = $1", [campaignId]);
+
+    for (const entry of leaderboardData) {
+        await query(
+            "INSERT INTO leaderboard (campaign_id, rank, username, score) VALUES ($1, $2, $3, $4)",
+            [entry.campaignId, entry.rank, entry.username, entry.score]
+        );
+    }
+
+    elizaLogger.log(`Leaderboard results saved for campaign ${campaignId}`);
+}
+
+function saveJsonToFile(jsonData: any, fileName: string): void {
+    const jsonString = JSON.stringify(jsonData, null, 2);
+    fs.writeFileSync(fileName, jsonString, "utf8");
+}
 
 export class TwitterSnapshotClient {
     client: ClientBase;
@@ -53,6 +83,7 @@ export class TwitterSnapshotClient {
             The max point should be 100 and min should be 0.
             The text can be in any language. There is no language constrain. For non-english text, Grammar & Structure can be ignored.
             The fairness should be key. The distribution should be based on the quality of the tweet.
+            The sentiment of the tweet should be considered.
             The goal of tweet can be to promote the project, airdrop, or campaign.
           <rules>
 
@@ -222,7 +253,7 @@ export class TwitterSnapshotClient {
         }
     }
 
-    async handleSnapshots() {
+    private async scrapeTweets() {
         let cursor: string;
         const fetchedCursors = [];
         const allTweets: Tweet[] = [];
@@ -251,7 +282,17 @@ export class TwitterSnapshotClient {
             }
         }
 
+        saveJsonToFile(allTweets, "allTweets.json");
+
+        return allTweets;
+    }
+
+    async handleSnapshots() {
+        const allTweets: Tweet[] = (await this.scrapeTweets()) as Tweet[];
+
         const scores = await this.getLeaderboard(allTweets);
+
+        await saveLeaderboardResults(stringToUuid("miraya7f"), scores);
 
         const leaderboard = scores.slice(0, 10);
 
@@ -265,7 +306,9 @@ ${leaderboard
     .join("\n")}
         `;
 
-        await this.postTweet(tweetTemplate);
+        console.log("tweetTemplate", tweetTemplate);
+
+        // await this.postTweet(tweetTemplate);
     }
 
     private async calculatePointScore(allTweets: Tweet[]) {
@@ -288,8 +331,9 @@ ${leaderboard
             pointScore += tweet.replies * scores.replies;
 
             const qualityScore =
-                qualityScores.find((item) => item.id === tweet.id).points || 0;
+                qualityScores.find((item) => item.id === tweet.id)?.points || 0;
 
+            // console.log("qualityScore", qualityScore, tweet.text);
             const qualityScoreMultiplier = 1 + qualityScore / 100;
             const score = pointScore * qualityScoreMultiplier;
 
@@ -304,7 +348,29 @@ ${leaderboard
             return tweet.username !== "miraya7f";
         });
 
-        const scoredTweets = await this.calculatePointScore(filteredTweets);
+        console.log("filteredTweets", filteredTweets.length);
+
+        const maxBreakLimit = 50;
+        // this.runtime.databaseAdapter.createRoom("twitter-snapshot");
+
+        let scoredTweets: {
+            tweet: Tweet;
+            score: number;
+        }[] = [];
+
+        if (filteredTweets.length > maxBreakLimit) {
+            const tweetChunks = [];
+            for (let i = 0; i < filteredTweets.length; i += maxBreakLimit) {
+                tweetChunks.push(filteredTweets.slice(i, i + maxBreakLimit));
+            }
+
+            for (const chunk of tweetChunks) {
+                const scoredChunk = await this.calculatePointScore(chunk);
+                scoredTweets = scoredTweets.concat(scoredChunk);
+            }
+        } else {
+            scoredTweets = await this.calculatePointScore(filteredTweets);
+        }
 
         const userScores = scoredTweets.reduce((acc, { tweet, score }) => {
             if (!acc[tweet.username]) {

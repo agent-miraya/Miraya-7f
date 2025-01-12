@@ -16,7 +16,8 @@
         "oauth": "^0.10.0",
         "oauth-1.0a": "^2.2.6",
         "twitter-api-v2": "^1.19.0",
-        "zod": "3.23.8"
+        "zod": "3.23.8",
+        "pg": "8.13.1"
     },
     "devDependencies": {
         "tsup": "8.3.5"

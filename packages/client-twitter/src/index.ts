@@ -32,7 +32,6 @@ class TwitterManager {
         //     "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
         //     1.0 // threshold in SOL
         // );
-
     }
 }
 
@@ -46,7 +45,7 @@ export const TwitterClientInterface: Client = {
         await manager.client.init();
 
         // await manager.snapshot.test()
-        await manager.snapshot.handleSnapshots()
+        await manager.snapshot.handleSnapshots();
 
         // await manager.monitor.start();
 

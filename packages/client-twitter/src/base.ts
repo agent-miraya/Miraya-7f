@@ -179,7 +179,11 @@ export class ClientBase extends EventEmitter {
                 username,
                 this.runtime.getSetting("TWITTER_PASSWORD"),
                 this.runtime.getSetting("TWITTER_EMAIL"),
-                this.runtime.getSetting("TWITTER_2FA_SECRET") || undefined
+                this.runtime.getSetting("TWITTER_2FA_SECRET") || undefined,
+                this.runtime.getSetting("X_CONSUMER_KEY") || undefined,
+                this.runtime.getSetting("X_CONSUMER_SECRET") || undefined,
+                this.runtime.getSetting("X_ACCESS_TOKEN") || undefined,
+                this.runtime.getSetting("X_ACCESS_SECRET") || undefined
             );
 
             if (await this.twitterClient.isLoggedIn()) {

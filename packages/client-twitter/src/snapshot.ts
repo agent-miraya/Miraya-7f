@@ -110,7 +110,7 @@ export class TwitterSnapshotClient {
             await this.client.init();
         }
 
-        const generateNewTweetLoop = async () => {
+        const runSnapshotterLoop = async () => {
             const lastPost = await this.runtime.cacheManager.get<{
                 timestamp: number;
             }>(
@@ -120,25 +120,22 @@ export class TwitterSnapshotClient {
             );
 
             const lastPostTimestamp = lastPost?.timestamp ?? 0;
-            const minMinutes =
-                parseInt(this.runtime.getSetting("POST_INTERVAL_MIN")) || 90;
-            const maxMinutes =
-                parseInt(this.runtime.getSetting("POST_INTERVAL_MAX")) || 180;
-            const randomMinutes =
-                Math.floor(Math.random() * (maxMinutes - minMinutes + 1)) +
-                minMinutes;
-            const delay = randomMinutes * 60 * 1000;
+
+            const postIntervalMin = 60 * 6;
+
+            const delay = postIntervalMin * 60 * 1000;
 
             if (Date.now() > lastPostTimestamp + delay) {
                 await this.handleSnapshots();
             }
 
             setTimeout(() => {
-                generateNewTweetLoop(); // Set up next iteration
+                runSnapshotterLoop(); // Set up next iteration
             }, delay);
 
-            elizaLogger.log(`Next tweet scheduled in ${randomMinutes} minutes`);
+            // elizaLogger.log(`Next tweet scheduled in ${randomMinutes} minutes`);
         };
+
         if (
             this.runtime.getSetting("POST_IMMEDIATELY") != null &&
             this.runtime.getSetting("POST_IMMEDIATELY") != ""
@@ -151,7 +148,7 @@ export class TwitterSnapshotClient {
             this.handleSnapshots();
         }
 
-        generateNewTweetLoop();
+        runSnapshotterLoop();
     }
 
     private async postTweet(content: string) {
@@ -178,41 +175,10 @@ export class TwitterSnapshotClient {
             try {
                 elizaLogger.log(`Posting new tweet:\n ${content}`);
 
-                const result = await this.client.requestQueue.add(
+                const tweet = await this.client.requestQueue.add(
                     async () =>
-                        await this.client.twitterClient.sendTweet(content)
+                        await this.client.twitterClient.sendTweetV2(content)
                 );
-
-                const body = await result.json();
-
-                if (!body?.data?.create_tweet?.tweet_results?.result) {
-                    console.error("Error sending tweet; Bad response:", body);
-                    return;
-                }
-
-                const tweetResult = body.data.create_tweet.tweet_results.result;
-
-                const tweet = {
-                    id: tweetResult.rest_id,
-                    name: this.client.profile.screenName,
-                    username: this.client.profile.username,
-                    text: tweetResult.legacy.full_text,
-                    conversationId: tweetResult.legacy.conversation_id_str,
-                    createdAt: tweetResult.legacy.created_at,
-                    timestamp: new Date(
-                        tweetResult.legacy.created_at
-                    ).getTime(),
-                    userId: this.client.profile.id,
-                    inReplyToStatusId:
-                        tweetResult.legacy.in_reply_to_status_id_str,
-                    permanentUrl: `https://twitter.com/${this.runtime.getSetting("TWITTER_USERNAME")}/status/${tweetResult.rest_id}`,
-                    hashtags: [],
-                    mentions: [],
-                    photos: [],
-                    thread: [],
-                    urls: [],
-                    videos: [],
-                } as Tweet;
 
                 await this.runtime.cacheManager.set(
                     `twitter/${this.client.profile.username}/lastPost`,
@@ -294,7 +260,7 @@ export class TwitterSnapshotClient {
 
         await saveLeaderboardResults(stringToUuid("miraya7f"), scores);
 
-        const leaderboard = scores.slice(0, 10);
+        const leaderboard = scores.slice(0, 20);
 
         const tweetTemplate = `
 Snapshooter: Below is the leaderboard for accounts using our hashtag #miraya7f 🚀
@@ -331,7 +297,8 @@ ${leaderboard
             pointScore += tweet.replies * scores.replies;
 
             const qualityScore =
-                qualityScores.find((item) => item.id === tweet.id)?.points || 0;
+                qualityScores?.find((item) => item.id === tweet.id)?.points ||
+                0;
 
             // console.log("qualityScore", qualityScore, tweet.text);
             const qualityScoreMultiplier = 1 + qualityScore / 100;
@@ -345,7 +312,10 @@ ${leaderboard
 
     private async getLeaderboard(tweets: Tweet[]) {
         const filteredTweets = tweets.filter((tweet) => {
-            return tweet.username !== "miraya7f";
+            return (
+                tweet.username !== "miraya7f" &&
+                tweet.username !== "sarthakvaishsol"
+            );
         });
 
         console.log("filteredTweets", filteredTweets.length);

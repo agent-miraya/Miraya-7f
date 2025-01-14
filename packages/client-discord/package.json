@@ -6,7 +6,6 @@
     "types": "dist/index.d.ts",
     "dependencies": {
         "@ai16z/eliza": "workspace:*",
-        "@ai16z/plugin-node": "workspace:*",
         "@discordjs/opus": "github:discordjs/opus",
         "@discordjs/rest": "2.4.0",
         "@discordjs/voice": "0.17.0",

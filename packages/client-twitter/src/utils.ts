@@ -452,5 +452,5 @@ export async function PostWithV2(text: string) {
         accessSecret: process.env.X_ACCESS_SECRET,
     });
 
-    await v2Client.v2.tweet(text);
+    return await v2Client.v2.tweet(text);
 }

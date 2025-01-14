@@ -28,17 +28,9 @@ import { zgPlugin } from "@ai16z/plugin-0g";
 import { goatPlugin } from "@ai16z/plugin-goat";
 import { bootstrapPlugin } from "@ai16z/plugin-bootstrap";
 // import { buttplugPlugin } from "@ai16z/plugin-buttplug";
-import {
-    coinbaseCommercePlugin,
-    coinbaseMassPaymentsPlugin,
-    tradePlugin,
-    tokenContractPlugin,
-    webhookPlugin,
-} from "@ai16z/plugin-coinbase";
 import { confluxPlugin } from "@ai16z/plugin-conflux";
 import { imageGenerationPlugin } from "@ai16z/plugin-image-generation";
 import { evmPlugin } from "@ai16z/plugin-evm";
-import { createNodePlugin } from "@ai16z/plugin-node";
 import { solanaPlugin } from "@ai16z/plugin-solana";
 import { aptosPlugin, TransferAptosToken } from "@ai16z/plugin-aptos";
 import { teePlugin } from "@ai16z/plugin-tee";
@@ -48,7 +40,7 @@ import path from "path";
 import readline from "readline";
 import { fileURLToPath } from "url";
 import yargs from "yargs";
-import {mainCharacter} from "../mainCharacter"
+import { mainCharacter } from "../mainCharacter";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -351,8 +343,6 @@ function getSecret(character: Character, secret: string) {
     return character.settings.secrets?.[secret] || process.env[secret];
 }
 
-let nodePlugin: any | undefined;
-
 export function createAgent(
     character: Character,
     db: IDatabaseAdapter,
@@ -365,8 +355,6 @@ export function createAgent(
         character.name
     );
 
-    nodePlugin ??= createNodePlugin();
-
     return new AgentRuntime({
         databaseAdapter: db,
         token,
@@ -378,7 +366,6 @@ export function createAgent(
             getSecret(character, "CONFLUX_CORE_PRIVATE_KEY")
                 ? confluxPlugin
                 : null,
-            nodePlugin,
             getSecret(character, "SOLANA_PUBLIC_KEY") ||
             (getSecret(character, "WALLET_PUBLIC_KEY") &&
                 !getSecret(character, "WALLET_PUBLIC_KEY")?.startsWith("0x"))
@@ -390,24 +377,16 @@ export function createAgent(
                 ? evmPlugin
                 : null,
             getSecret(character, "ZEROG_PRIVATE_KEY") ? zgPlugin : null,
-            getSecret(character, "COINBASE_COMMERCE_KEY")
-                ? coinbaseCommercePlugin
-                : null,
             getSecret(character, "FAL_API_KEY") ||
             getSecret(character, "OPENAI_API_KEY") ||
             getSecret(character, "HEURIST_API_KEY")
                 ? imageGenerationPlugin
                 : null,
-            ...(getSecret(character, "COINBASE_API_KEY") &&
-            getSecret(character, "COINBASE_PRIVATE_KEY")
-                ? [coinbaseMassPaymentsPlugin, tradePlugin, tokenContractPlugin]
-                : []),
             getSecret(character, "COINBASE_API_KEY") &&
             getSecret(character, "COINBASE_PRIVATE_KEY") &&
-            getSecret(character, "COINBASE_NOTIFICATION_URI")
-                ? webhookPlugin
+            getSecret(character, "WALLET_SECRET_SALT")
+                ? teePlugin
                 : null,
-            getSecret(character, "WALLET_SECRET_SALT") ? teePlugin : null,
             getSecret(character, "ALCHEMY_API_KEY") ? goatPlugin : null,
             getSecret(character, "APTOS_PRIVATE_KEY") ? aptosPlugin : null,
         ].filter(Boolean),

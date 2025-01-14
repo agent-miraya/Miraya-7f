@@ -45,7 +45,8 @@ export const TwitterClientInterface: Client = {
         await manager.client.init();
 
         // await manager.snapshot.test()
-        await manager.snapshot.handleSnapshots();
+        // await manager.snapshot.handleSnapshots();
+        await manager.snapshot.start();
 
         // await manager.monitor.start();
 

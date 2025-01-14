@@ -43,7 +43,6 @@ case "$1" in
             "core"
             "plugin-bootstrap"
             "plugin-image-generation"
-            "plugin-node"
             "plugin-solana"
             "plugin-evm"
             "plugin-tee"

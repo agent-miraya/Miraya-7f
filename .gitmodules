@@ -1,3 +1,3 @@
 [submodule "packages/lit-actions"]
 	path = packages/lit-actions
-	url = git@github.com:agent-miraya/Miraya-lit-actions.git
+	url = https://ithub.com:agent-miraya/Miraya-lit-actions.git

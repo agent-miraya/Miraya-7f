@@ -225,7 +225,6 @@ export class TwitterSnapshotClient {
         const allTweets: Tweet[] = [];
 
         while (true) {
-            console.log("fetching cursor", cursor);
             await new Promise((resolve) =>
                 setTimeout(resolve, 5000 + Math.random() * 5000)
             );
@@ -237,8 +236,6 @@ export class TwitterSnapshotClient {
                 cursor
             );
 
-            // console.log("recentTweets", recentTweets.tweets.length, recentTweets.next, recentTweets.previous )
-
             cursor = recentTweets.next;
             fetchedCursors.push(cursor);
 
@@ -248,7 +245,7 @@ export class TwitterSnapshotClient {
             }
         }
 
-        saveJsonToFile(allTweets, "allTweets.json");
+        // saveJsonToFile(allTweets, "allTweets.json");
 
         return allTweets;
     }
@@ -267,14 +264,12 @@ Snapshooter: Below is the leaderboard for accounts using our hashtag #miraya7f ð
 
 ${leaderboard
     .map((item, index) => {
-        return `${index + 1}. @${item.username}`;
+        return `${index + 1}. ${item.username}`;
     })
     .join("\n")}
         `;
 
-        console.log("tweetTemplate", tweetTemplate);
-
-        // await this.postTweet(tweetTemplate);
+        await this.postTweet(tweetTemplate);
     }
 
     private async calculatePointScore(allTweets: Tweet[]) {

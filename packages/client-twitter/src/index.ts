@@ -46,13 +46,13 @@ export const TwitterClientInterface: Client = {
 
         // await manager.snapshot.test()
         // await manager.snapshot.handleSnapshots();
-        await manager.snapshot.start();
+        // await manager.snapshot.start();
 
         // await manager.monitor.start();
 
         // await manager.post.start();
 
-        // await manager.interaction.start();
+        await manager.interaction.start();
 
         return manager;
     },

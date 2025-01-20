@@ -251,9 +251,14 @@ export class TwitterSnapshotClient {
     }
 
     async handleSnapshots() {
+        elizaLogger.log("handleSnapshots starter");
         const allTweets: Tweet[] = (await this.scrapeTweets()) as Tweet[];
 
+        elizaLogger.log(`Fetched ${allTweets.length} tweets`);
+
         const scores = await this.getLeaderboard(allTweets);
+
+        elizaLogger.log(`Scored calculated`);
 
         await saveLeaderboardResults(stringToUuid("miraya7f"), scores);
 
@@ -269,7 +274,9 @@ ${leaderboard
     .join("\n")}
         `;
 
-        await this.postTweet(tweetTemplate);
+        console.log(tweetTemplate);
+
+        // await this.postTweet(tweetTemplate);
     }
 
     private async calculatePointScore(allTweets: Tweet[]) {
